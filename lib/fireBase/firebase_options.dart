@@ -17,17 +17,29 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
-        return windows;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -40,49 +52,11 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAbAxeB9PYRv2_uYbWM2MEIEd-ZB89F4Y4',
-    appId: '1:1071701599652:web:83de47f4710ec7403ecd31',
-    messagingSenderId: '1071701599652',
-    projectId: 'financas-f36c6',
-    authDomain: 'financas-f36c6.firebaseapp.com',
-    storageBucket: 'financas-f36c6.firebasestorage.app',
-    measurementId: 'G-GD4NDBG3JY',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCISSe3iBHmCNCkXB8MOoNZOsQ4b1vg21I',
-    appId: '1:1071701599652:android:bf4112e331b50b383ecd31',
+    appId: '1:1071701599652:android:73ec489be384a8393ecd31',
     messagingSenderId: '1071701599652',
     projectId: 'financas-f36c6',
     storageBucket: 'financas-f36c6.firebasestorage.app',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB_HMpkwGRJu2sBEdMhFqLPVz0SshKp3H4',
-    appId: '1:1071701599652:ios:926995943061c6933ecd31',
-    messagingSenderId: '1071701599652',
-    projectId: 'financas-f36c6',
-    storageBucket: 'financas-f36c6.firebasestorage.app',
-    iosBundleId: 'com.example.financas',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyB_HMpkwGRJu2sBEdMhFqLPVz0SshKp3H4',
-    appId: '1:1071701599652:ios:926995943061c6933ecd31',
-    messagingSenderId: '1071701599652',
-    projectId: 'financas-f36c6',
-    storageBucket: 'financas-f36c6.firebasestorage.app',
-    iosBundleId: 'com.example.financas',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAbAxeB9PYRv2_uYbWM2MEIEd-ZB89F4Y4',
-    appId: '1:1071701599652:web:1849935f4bff07863ecd31',
-    messagingSenderId: '1071701599652',
-    projectId: 'financas-f36c6',
-    authDomain: 'financas-f36c6.firebaseapp.com',
-    storageBucket: 'financas-f36c6.firebasestorage.app',
-    measurementId: 'G-GT8RTDJJ4M',
   );
 }
