@@ -15,32 +15,59 @@ class ChecadorLogin extends StatefulWidget {
   User? usuario;
   @override
   State<StatefulWidget> createState() {
-    usuarioFuturo.then((user) {
-      usuario = user;
-    });
-    return ChecardorLoginState(usuario);
+    return ChecardorLoginState();
   }
 }
 
 class ChecardorLoginState extends State<ChecadorLogin> {
-  
-    //Não uso widget.usuario(para usar o widget da classe pai) 
-    //pq preciso trocar a informação dele em uma função interna;
-    //Não tenho certeza se é necessário 
-  User? usuario;
-  ChecardorLoginState(this.usuario);
+  User? usuario = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
-    Widget widgetEscolhido = selecionadorDeClasse(usuario, refresh); //Enviar o refresh 
-    return widgetEscolhido;                                          //para poder atualizar a classe
+    
+    if (usuario != null) {
+      DateTime dt = DateTime.now();
+      List<Atualizacao> listaEntrada = [], listaSaida = [];
+      final bd = BancoDeDados(id: usuario!.uid);
+
+      return FutureBuilder(
+          future: Future.wait([bd.getListaEntradas(dt), bd.getListaSaida(dt)]),
+          builder: (context, AsyncSnapshot<List<List<Atualizacao>>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                return Center(child: Text("Erro ao carregar dados"));
+              }
+              listaEntrada = snapshot.data![0];
+              listaSaida = snapshot.data![1];
+
+              return Inicio(
+                user: usuario,
+                notify: refresh,
+                listaEntrada: listaEntrada,
+                listaSaida: listaSaida,
+                bd: bd,
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          });
+    } else {
+      return FazerLogin(refresh);
+    }
   }
 
   void refresh(User? user, bool _isSignOut) {
-    if(_isSignOut) signOut();   //Preciso saber se é signOut pra não excluir o usuario junto com o signIn
-    setState(() {
-      usuario = user;
-    });
+    if (_isSignOut) {
+      signOut().then((_) {
+        setState(() {
+          usuario = null;
+        });
+      });
+    } else {
+      setState(() {
+        usuario = user;
+      });
+    }
   }
 }
 
@@ -56,7 +83,7 @@ class FazerLogin extends StatelessWidget {
             try {
               Future<User?> future = signInWithGoogle();
               future.then((user) {
-                notify(user,false);
+                notify(user, false);
               });
             } on Exception catch (e) {
               debugPrint(e.toString());
@@ -65,47 +92,6 @@ class FazerLogin extends StatelessWidget {
           child: Text("Fazer Login com Google")),
     );
   }
-}
-
-Widget selecionadorDeClasse(User? usuario, Function notify) {
-  Widget qualWidgetEntrar;
-
-  if (usuario != null) {
-    print("usuario encontrado");
-    List<Atualizacao> listaEntrada = [], listaSaida = [];
-
-    final bd = BancoDeDados(id: usuario.uid);
-
-    DateTime dt = DateTime.now();
-
-    return FutureBuilder(
-      future: Future.wait([bd.getListaEntradas(dt), bd.getListaSaida(dt)]),
-      builder: (context, AsyncSnapshot<List<List<Atualizacao>>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasError) {
-            return Center(child: Text("Erro ao carregar dados"));
-          }
-          listaEntrada = snapshot.data![0];
-          listaSaida = snapshot.data![1];
-
-          return Inicio(
-            user: usuario,
-            notify: notify,
-            listaEntrada: listaEntrada,
-            listaSaida: listaSaida,
-            bd: bd,
-          );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
-    );
-  } else {
-    print("usuario nao encontrado");
-    qualWidgetEntrar = FazerLogin(notify);
-  }
-
-  return qualWidgetEntrar;
 }
 
 //Codigos prontos do FireBase
@@ -128,7 +114,6 @@ Future<User?> signInWithGoogle() async {
     final User? user = userCredential.user;
     print("signInWithGoogle succeeded: $user");
     return user;
-
   } catch (e) {
     debugPrint(e.toString());
   }
