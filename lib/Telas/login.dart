@@ -78,15 +78,27 @@ Widget selecionadorDeClasse(User? usuario, Function notify) {
 
     DateTime dt = DateTime.now();
 
-    bd.getListaEntradas(dt).then((lista){listaEntrada = lista;});
-    bd.getListaSaida(dt).then((lista){listaSaida = lista;});
+    return FutureBuilder(
+      future: Future.wait([bd.getListaEntradas(dt), bd.getListaSaida(dt)]),
+      builder: (context, AsyncSnapshot<List<List<Atualizacao>>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return Center(child: Text("Erro ao carregar dados"));
+          }
+          listaEntrada = snapshot.data![0];
+          listaSaida = snapshot.data![1];
 
-    qualWidgetEntrar = Inicio(
-      user: usuario,
-      notify: notify,
-      listaEntrada: listaEntrada,
-      listaSaida: listaSaida,
-      bd: bd
+          return Inicio(
+            user: usuario,
+            notify: notify,
+            listaEntrada: listaEntrada,
+            listaSaida: listaSaida,
+            bd: bd,
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
     );
   } else {
     print("usuario nao encontrado");

@@ -39,7 +39,7 @@ class InicioState extends State<Inicio> {
       debugPrint(listaEntrada.toString());
     return Scaffold(
       //
-      appBar: AppBar(
+      appBar: AppBar( 
         title: Text(
           "Meu App de Finanças Pessoais",
           style: TextStyle(fontSize: 24),
@@ -137,7 +137,7 @@ class InicioState extends State<Inicio> {
                     refresh(widget.bd);
                   }
                 });
-              } catch (e) {
+              } catch (e) { 
                 debugPrint(e.toString());
               }
             },
@@ -152,9 +152,11 @@ class InicioState extends State<Inicio> {
 
   refresh(bd) async {
     setState(() async {
+      print("inicializando setState");
       DateTime dt = DateTime.now();
       listaEntrada = await bd.getListaEntradas(dt);
       listaSaida = await bd.getListaSaida(dt);
+      print("finalizando setState");
     });
   }
 }
