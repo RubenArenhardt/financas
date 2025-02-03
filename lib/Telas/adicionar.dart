@@ -17,16 +17,17 @@ radioButtonList? _radioButtonSelecionado = radioButtonList.Entrada;
 final MoneyMaskedTextController _controllerValor =
     MoneyMaskedTextController(leftSymbol: 'R\$ ');
 
-List<String> tags = [
-  "Salario",
-  "Investimento",
-  "Mercado",
-  "Transporte",
-  "Comida",
-  "Casa",
-  "Lazer",
-  "Outros"
-];
+Map<String,radioButtonList> tags = {
+  "Salario":radioButtonList.Entrada,
+  "Investimento":radioButtonList.Entrada,
+  "Outros":radioButtonList.Entrada,
+  "Mercado":radioButtonList.Saida,
+  "Transporte":radioButtonList.Saida,
+  "Comida":radioButtonList.Saida,
+  "Casa":radioButtonList.Saida,
+  "Lazer":radioButtonList.Saida,
+  "Outros":radioButtonList.Saida
+};
 
 final TextEditingController _controllerTag = TextEditingController();
 
@@ -36,8 +37,12 @@ final TextEditingController _controllerData = TextEditingController(
 
 final TextEditingController _controllerObservacao = TextEditingController();
 
-class Adicionar extends StatelessWidget {
+class Adicionar extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => AdicionarState();
+}
 
+class AdicionarState extends State<Adicionar> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -69,13 +74,13 @@ class Adicionar extends StatelessWidget {
                   child: TextField(
                     controller: _controllerNome,
                     decoration: InputDecoration(
-                      label: Text("Nome"),
+                      label: Text("Título"),
                     ),
                   ),
                 ),
                 //
                 Center(
-                  child: RadioButtonTeste(),
+                  child: RadioButton(),
                 ),
                 //
                 Padding(
@@ -148,12 +153,12 @@ class Adicionar extends StatelessWidget {
   }
 }
 
-class RadioButtonTeste extends StatefulWidget {
+class RadioButton extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _EntradaSaidaRadio();
 }
 
-class _EntradaSaidaRadio extends State {
+class _EntradaSaidaRadio extends State<RadioButton> {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -198,19 +203,19 @@ class DropdownMenuTag extends StatefulWidget {
   State<StatefulWidget> createState() => _TagState();
 }
 
-class _TagState extends State {
+class _TagState extends State<DropdownMenuTag> {
   @override
   Widget build(BuildContext context) {
     return DropdownMenu<String>(
       controller: _controllerTag,
-      initialSelection: tags.first,
+      initialSelection: tags.keys.first,
       onSelected: (String? value) {
         setState(() {
           value!;
         });
       },
-      dropdownMenuEntries: tags.map((String value) {
-        return DropdownMenuEntry<String>(value: value, label: value);
+      dropdownMenuEntries: tags.entries.map((entry) {
+        return DropdownMenuEntry<String>(value: entry.key, label: entry.key);
       }).toList(),
     );
   }

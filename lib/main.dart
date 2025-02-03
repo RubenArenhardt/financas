@@ -33,3 +33,4 @@ void main() async {
 //Packadges:
 //pie_chart (https://pub.dev/packages/pie_chart),
 //flutter_masked_text (https://pub.dev/packages/flutter_masked_text2/install),
+//firebase_core (https://pub.dev/packages/firebase_core/install),

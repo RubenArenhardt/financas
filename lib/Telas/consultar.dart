@@ -76,7 +76,7 @@ class ConsultarState extends State<Consultar> {
 
   atualizaState({required BancoDeDados bd, required DateTime dt}) async {
     listaEntrada = await bd.getListaEntradas(dt);
-    listaSaida = await bd.getListaSaida(dt);
+    listaSaida = await bd.getListaSaidas(dt);
     setState(() {});
   }
 }  
