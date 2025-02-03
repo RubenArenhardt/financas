@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, equal_keys_in_map
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -20,13 +20,13 @@ final MoneyMaskedTextController _controllerValor =
 Map<String,radioButtonList> tags = {
   "Salario":radioButtonList.Entrada,
   "Investimento":radioButtonList.Entrada,
-  "Outros":radioButtonList.Entrada,
   "Mercado":radioButtonList.Saida,
   "Transporte":radioButtonList.Saida,
   "Comida":radioButtonList.Saida,
   "Casa":radioButtonList.Saida,
   "Lazer":radioButtonList.Saida,
-  "Outros":radioButtonList.Saida
+  "Outras Entradas":radioButtonList.Entrada,
+  "Outras Saídas":radioButtonList.Saida
 };
 
 final TextEditingController _controllerTag = TextEditingController();
@@ -80,7 +80,13 @@ class AdicionarState extends State<Adicionar> {
                 ),
                 //
                 Center(
-                  child: RadioButton(),
+                  child: RadioButton(
+                    onChanged: (radioButtonList? value) {
+                      setState(() {
+                        _radioButtonSelecionado = value;
+                      });
+                    },
+                  ),
                 ),
                 //
                 Padding(
@@ -88,7 +94,6 @@ class AdicionarState extends State<Adicionar> {
                   child: DropdownMenuTag(),
                 ),
                 //ToDo:
-                //Separar tags de entrada e saida em listas
                 //Adicionar opção de adicionar itens personalizados para as listas
                 //
                 Padding(
@@ -154,6 +159,10 @@ class AdicionarState extends State<Adicionar> {
 }
 
 class RadioButton extends StatefulWidget {
+  final ValueChanged<radioButtonList?> onChanged;
+
+  RadioButton({required this.onChanged});
+
   @override
   State<StatefulWidget> createState() => _EntradaSaidaRadio();
 }
@@ -174,6 +183,7 @@ class _EntradaSaidaRadio extends State<RadioButton> {
                     setState(() {
                       _radioButtonSelecionado = value;
                     });
+                    widget.onChanged(value);
                   }),
             ),
           ),
@@ -189,6 +199,7 @@ class _EntradaSaidaRadio extends State<RadioButton> {
                     setState(() {
                       _radioButtonSelecionado = value;
                     });
+                    widget.onChanged(value);
                   }),
             ),
           ),
@@ -206,16 +217,23 @@ class DropdownMenuTag extends StatefulWidget {
 class _TagState extends State<DropdownMenuTag> {
   @override
   Widget build(BuildContext context) {
+    List<String> filteredTags = tags.entries
+        .where((entry) => entry.value == (_isEntrada() ? radioButtonList.Entrada : radioButtonList.Saida))
+        .map((entry) => entry.key)
+        .toList();
+
+        print(filteredTags);
+
     return DropdownMenu<String>(
       controller: _controllerTag,
-      initialSelection: tags.keys.first,
+      initialSelection: filteredTags.first,
       onSelected: (String? value) {
         setState(() {
-          value!;
+          _controllerTag.text = value!;
         });
       },
-      dropdownMenuEntries: tags.entries.map((entry) {
-        return DropdownMenuEntry<String>(value: entry.key, label: entry.key);
+      dropdownMenuEntries: filteredTags.map((tag) {
+        return DropdownMenuEntry<String>(value: tag, label: tag);
       }).toList(),
     );
   }
@@ -267,11 +285,7 @@ Atualizacao _criaAtualizacao() {
       data = _controllerData.text;
   final double valor = _controllerValor.numberValue;
   final bool isEntrada;
-  if (_radioButtonSelecionado == radioButtonList.Entrada) {
-    isEntrada = true;
-  } else {
-    isEntrada = false;
-  }
+  isEntrada = _isEntrada();
   final atualizacao = Atualizacao(
       nome: nome,
       isEntrada: isEntrada,
@@ -283,3 +297,7 @@ Atualizacao _criaAtualizacao() {
   print(atualizacao.toString());
   return atualizacao;
 }
+
+bool _isEntrada() {
+    return _radioButtonSelecionado == radioButtonList.Entrada;
+  }
