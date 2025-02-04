@@ -10,19 +10,18 @@ import 'package:pie_chart/pie_chart.dart';
 class Consultar extends StatefulWidget {
   final BancoDeDados bd;
   final List<Atualizacao> listaEntrada, listaSaida;
-  Consultar({required this.bd, required this.listaEntrada, required this.listaSaida});
+  Consultar(
+      {required this.bd, required this.listaEntrada, required this.listaSaida});
 
   DateTime dt = DateTime.now();
 
   @override
   State<StatefulWidget> createState() {
     return ConsultarState(listaEntrada, listaSaida, dt);
-  } 
-  
+  }
 }
 
 class ConsultarState extends State<Consultar> {
-
   List<Atualizacao> listaEntrada, listaSaida;
 
   DateTime dt;
@@ -33,9 +32,9 @@ class ConsultarState extends State<Consultar> {
 
   @override
   Widget build(BuildContext context) {
-    
     double valorTotal = calculaValor(
         bd: widget.bd, listaEntrada: listaEntrada, listaSaida: listaSaida);
+        String data = dt.month.toString() + "/" + dt.year.toString();
 
     return Scaffold(
       appBar: AppBar(
@@ -43,7 +42,31 @@ class ConsultarState extends State<Consultar> {
       ),
       body: Column(
         children: [
-          Header(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                onPressed: () {setState(() {
+                  debugPrint("subtraindo 30 dias");
+                  dt = dt.subtract(Duration(days: 30));
+                  atualizaState(bd: widget.bd, dt: dt);
+                });},
+                icon: Icon(Icons.arrow_left),
+              ),
+              TextButton(
+                onPressed: () {},
+                child: Text(data),
+              ),
+              IconButton(
+                onPressed: () {setState(() {
+                  debugPrint("adicionando 30 dias");
+                  dt = dt.add(Duration(days: 30));
+                  atualizaState(bd: widget.bd, dt: dt);
+                });},
+                icon: Icon(Icons.arrow_right),
+              ),
+            ],
+          ),
           Container(
             padding: EdgeInsets.fromLTRB(25, 0, 25, 0),
             child: Text(
@@ -78,29 +101,6 @@ class ConsultarState extends State<Consultar> {
     listaEntrada = await bd.getListaEntradas(dt);
     listaSaida = await bd.getListaSaidas(dt);
     setState(() {});
-  }
-}  
-
-class Header extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.arrow_left),
-        ),
-        TextButton(
-          onPressed: () {},
-          child: Text("Mês / Ano"),
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.arrow_right),
-        ),
-      ],
-    );
   }
 }
 
