@@ -63,8 +63,8 @@ class ConsultarState extends State<Consultar> {
               dataMap: atualizaGrafico(listaSaida, listaEntrada),
               chartType: ChartType.disc,
               chartValuesOptions: const ChartValuesOptions(
-                showChartValuesInPercentage: true,
-                decimalPlaces: 0,
+                showChartValuesInPercentage: false,
+                decimalPlaces: 2,
               ),
             ),
           ),
@@ -145,14 +145,16 @@ class Listagem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
-      child: ListView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        itemCount: lista.length,
-        itemBuilder: (context, indice) {
-          return ItemAtualizacao(atualizacao: lista[indice]);
-        },
+    return Expanded(
+      child: Scrollbar(
+        child: ListView.builder(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemCount: lista.length,
+          itemBuilder: (context, indice) {
+            return ItemAtualizacao(atualizacao: lista[indice]);
+          },
+        ),
       ),
     );
   }

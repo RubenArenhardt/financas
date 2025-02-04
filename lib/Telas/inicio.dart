@@ -41,7 +41,7 @@ class InicioState extends State<Inicio> {
       //
       appBar: AppBar( 
         title: Text(
-          "Meu App de Finanças Pessoais",
+          "Na Ponta do Lápis",
           style: TextStyle(fontSize: 24),
         ),
         actions: [
@@ -96,8 +96,8 @@ class InicioState extends State<Inicio> {
                   legendPosition: LegendPosition.bottom,
                 ),
                 chartValuesOptions: ChartValuesOptions(
-                  showChartValuesInPercentage: true,
-                  decimalPlaces: 0,
+                  showChartValuesInPercentage: false,
+                  decimalPlaces: 2,
                 ),
               ),
             ),
@@ -133,6 +133,7 @@ class InicioState extends State<Inicio> {
                     setState(() {
                       widget.bd.add(atualizacao);
                     });
+                    refresh(widget.bd);
                   }else{
                     refresh(widget.bd);
                   }
@@ -151,12 +152,14 @@ class InicioState extends State<Inicio> {
   }
 
   refresh(bd) async {
-    setState(() async {
-      print("inicializando setState");
-      DateTime dt = DateTime.now();
-      listaEntrada = await bd.getListaEntradas(dt);
-      listaSaida = await bd.getListaSaidas(dt);
-      print("finalizando setState");
+    print("inicializando refresh");
+    DateTime dt = DateTime.now();
+    List<Atualizacao> entradas = await bd.getListaEntradas(dt);
+    List<Atualizacao> saidas = await bd.getListaSaidas(dt);
+    setState(() {
+      listaEntrada = entradas;
+      listaSaida = saidas;
     });
+    print("finalizando refresh");
   }
 }
