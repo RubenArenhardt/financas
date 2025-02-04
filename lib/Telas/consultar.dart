@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable
 import 'package:financas/fireBase/bancoDeDados.dart';
 import 'package:financas/funcoes/funcoes.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +76,7 @@ class ConsultarState extends State<Consultar> {
 
   atualizaState({required BancoDeDados bd, required DateTime dt}) async {
     listaEntrada = await bd.getListaEntradas(dt);
-    listaSaida = await bd.getListaSaida(dt);
+    listaSaida = await bd.getListaSaidas(dt);
     setState(() {});
   }
 }  

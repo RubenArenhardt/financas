@@ -69,7 +69,7 @@ class BancoDeDados {
     return entradas;
   }
 
-  Future<List<Atualizacao>> getListaSaida(DateTime dt) async {
+  Future<List<Atualizacao>> getListaSaidas(DateTime dt) async {
     List<Atualizacao> saidas = [];
 
     try {

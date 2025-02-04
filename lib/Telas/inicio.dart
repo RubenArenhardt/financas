@@ -155,7 +155,7 @@ class InicioState extends State<Inicio> {
       print("inicializando setState");
       DateTime dt = DateTime.now();
       listaEntrada = await bd.getListaEntradas(dt);
-      listaSaida = await bd.getListaSaida(dt);
+      listaSaida = await bd.getListaSaidas(dt);
       print("finalizando setState");
     });
   }

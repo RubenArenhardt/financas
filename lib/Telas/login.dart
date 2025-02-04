@@ -31,7 +31,7 @@ class ChecardorLoginState extends State<ChecadorLogin> {
       final bd = BancoDeDados(id: usuario!.uid);
 
       return FutureBuilder(
-          future: Future.wait([bd.getListaEntradas(dt), bd.getListaSaida(dt)]),
+          future: Future.wait([bd.getListaEntradas(dt), bd.getListaSaidas(dt)]),
           builder: (context, AsyncSnapshot<List<List<Atualizacao>>> snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
