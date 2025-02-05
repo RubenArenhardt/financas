@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable
+import 'package:financas/Telas/adicionar.dart';
 import 'package:financas/fireBase/bancoDeDados.dart';
 import 'package:financas/funcoes/funcoes.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,7 @@ class ConsultarState extends State<Consultar> {
   Widget build(BuildContext context) {
     double valorTotal = calculaValor(
         bd: widget.bd, listaEntrada: listaEntrada, listaSaida: listaSaida);
-        String data = dt.month.toString() + "/" + dt.year.toString();
+    String data = dt.month.toString() + "/" + dt.year.toString();
 
     return Scaffold(
       appBar: AppBar(
@@ -46,11 +47,12 @@ class ConsultarState extends State<Consultar> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                onPressed: () {setState(() {
-                  debugPrint("subtraindo 30 dias");
-                  dt = dt.subtract(Duration(days: 30));
-                  atualizaState(bd: widget.bd, dt: dt);
-                });},
+                onPressed: () {
+                  setState(() {
+                    dt = dt.subtract(Duration(days: 30));
+                    refresh(bd: widget.bd, dt: dt);
+                  });
+                },
                 icon: Icon(Icons.arrow_left),
               ),
               TextButton(
@@ -58,11 +60,12 @@ class ConsultarState extends State<Consultar> {
                 child: Text(data),
               ),
               IconButton(
-                onPressed: () {setState(() {
-                  debugPrint("adicionando 30 dias");
-                  dt = dt.add(Duration(days: 30));
-                  atualizaState(bd: widget.bd, dt: dt);
-                });},
+                onPressed: () {
+                  setState(() {
+                    dt = dt.add(Duration(days: 30));
+                    refresh(bd: widget.bd, dt: dt);
+                  });
+                },
                 icon: Icon(Icons.arrow_right),
               ),
             ],
@@ -91,16 +94,25 @@ class ConsultarState extends State<Consultar> {
               ),
             ),
           ),
-          Listagem(lista: juntaLista(listaEntrada, listaSaida)),
+          Listagem(
+            lista: juntaLista(listaEntrada, listaSaida),
+            bd: widget.bd,
+            refreshCallback: () {
+              refresh(bd: widget.bd, dt: dt);
+            },
+          ),
         ],
       ),
     );
   }
 
-  atualizaState({required BancoDeDados bd, required DateTime dt}) async {
-    listaEntrada = await bd.getListaEntradas(dt);
-    listaSaida = await bd.getListaSaidas(dt);
-    setState(() {});
+  refresh({required BancoDeDados bd, required DateTime dt}) async {
+    List<Atualizacao> entradas = await bd.getListaEntradas(dt);
+    List<Atualizacao> saidas = await bd.getListaSaidas(dt);
+    setState(() {
+      listaEntrada = entradas;
+      listaSaida = saidas;
+    });
   }
 }
 
@@ -138,9 +150,13 @@ List<Atualizacao> juntaLista(List<Atualizacao> lEntrada, lSaida) {
 
 class Listagem extends StatelessWidget {
   final List<Atualizacao> lista;
+  final BancoDeDados bd;
+  final Function refreshCallback;
 
   const Listagem({
     required this.lista,
+    required this.bd,
+    required this.refreshCallback,
   });
 
   @override
@@ -152,7 +168,11 @@ class Listagem extends StatelessWidget {
           shrinkWrap: true,
           itemCount: lista.length,
           itemBuilder: (context, indice) {
-            return ItemAtualizacao(atualizacao: lista[indice]);
+            return ItemAtualizacao(
+              atualizacao: lista[indice],
+              bd: bd,
+              refreshCallback: refreshCallback,
+            );
           },
         ),
       ),
@@ -162,31 +182,62 @@ class Listagem extends StatelessWidget {
 
 class ItemAtualizacao extends StatelessWidget {
   final Atualizacao atualizacao;
+  final BancoDeDados bd;
+  final Function refreshCallback;
 
-  ItemAtualizacao({required this.atualizacao});
+  ItemAtualizacao({
+    required this.atualizacao,
+    required this.bd,
+    required this.refreshCallback,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Row(
-              children: [Text(atualizacao.nome), Text(atualizacao.data)],
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return InkWell(
+      onTap: () async {
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Adicionar(
+              atualizacao: atualizacao,
             ),
-            Row(
-              children: [
-                Text(
-                  atualizacao.valor.toString(),
-                  style: TextStyle(color: corValorAtu(atualizacao)),
-                ),
-                Text(atualizacao.tag)
-              ],
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            ),
-          ],
+          ),
+        );
+
+        if (result != null) {
+          final Atualizacao novaAtu = result[0];
+          final int action = result[1];
+
+          if (action == 1) {
+            await bd.edit(atualizacao, novaAtu);
+          } else if (action == 2) {
+            await bd.delete(atualizacao);
+          }
+
+          refreshCallback();
+        }
+      },
+      child: Card(
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Row(
+                children: [Text(atualizacao.nome), Text(atualizacao.data)],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ),
+              Row(
+                children: [
+                  Text(
+                    atualizacao.valor.toString(),
+                    style: TextStyle(color: corValorAtu(atualizacao)),
+                  ),
+                  Text(atualizacao.tag)
+                ],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ),
+            ],
+          ),
         ),
       ),
     );

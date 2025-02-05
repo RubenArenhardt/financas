@@ -38,11 +38,30 @@ final TextEditingController _controllerData = TextEditingController(
 final TextEditingController _controllerObservacao = TextEditingController();
 
 class Adicionar extends StatefulWidget {
+  final Atualizacao? atualizacao;
+
+  Adicionar({this.atualizacao});
+
   @override
   State<StatefulWidget> createState() => AdicionarState();
 }
 
 class AdicionarState extends State<Adicionar> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.atualizacao != null) {
+      _controllerNome.text = widget.atualizacao!.nome;
+      _controllerValor.updateValue(widget.atualizacao!.valor);
+      _controllerTag.text = widget.atualizacao!.tag;
+      _controllerData.text = widget.atualizacao!.data;
+      _controllerObservacao.text = widget.atualizacao!.observacao;
+      _radioButtonSelecionado = widget.atualizacao!.isEntrada
+          ? radioButtonList.Entrada
+          : radioButtonList.Saida;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -60,7 +79,9 @@ class AdicionarState extends State<Adicionar> {
         //
         //
         appBar: AppBar(
-          title: Text("Adicionar Entrada/Saída"),
+          title: Text(widget.atualizacao == null
+              ? "Adicionar Entrada/Saída"
+              : "Editar Entrada/Saída"),
         ),
         //
         //
@@ -127,27 +148,53 @@ class AdicionarState extends State<Adicionar> {
           ),
         ),
         //
-        //
         persistentFooterButtons: [
           Row(
             children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () {
-                    final Atualizacao atualizacao = _criaAtualizacao();
-                    Navigator.pop(context, atualizacao);
-                  },
-                  child: Text("Confirmar"),
+              if (widget.atualizacao == null) ...[
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      final Atualizacao atualizacao = _criaAtualizacao();
+                      Navigator.pop(context, atualizacao);
+                    },
+                    child: Text("Confirmar"),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text("Cancelar"),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Cancelar"),
+                  ),
                 ),
-              ),
+              ] else ...[
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pop(context, [_criaAtualizacao(), 1]);
+                    },
+                    child: Text("Editar"),
+                  ),
+                ),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pop(context, [_criaAtualizacao(), 2]);
+                    },
+                    child: Text("Deletar"),
+                  ),
+                ),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pop(context, null);
+                    },
+                    child: Text("Cancelar"),
+                  ),
+                ),
+              ],
             ],
           ),
         ],

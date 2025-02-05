@@ -111,10 +111,11 @@ class InicioState extends State<Inicio> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           FloatingActionButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return Consultar(bd: widget.bd, listaEntrada: listaEntrada,listaSaida: listaSaida,);
+            onPressed: () async {
+              await Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return Consultar(bd: widget.bd, listaEntrada: listaEntrada, listaSaida: listaSaida);
               }));
+              refresh(widget.bd);
             },
             child: Icon(Icons.remove_red_eye),
             //Por algum motivo ele da erro colocando 2 floatingActionButton
@@ -160,6 +161,5 @@ class InicioState extends State<Inicio> {
       listaEntrada = entradas;
       listaSaida = saidas;
     });
-    print("finalizando refresh");
   }
 }

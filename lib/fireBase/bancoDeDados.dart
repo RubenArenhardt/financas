@@ -34,13 +34,41 @@ class BancoDeDados {
     }
   }
 
-  //edit
-
   //delete
+  delete(Atualizacao atu) {
+    String tipoAtualizacao;
+    if (atu.isEntrada) {
+      tipoAtualizacao = "Entrada";
+    } else {
+      tipoAtualizacao = "Saida";
+    }
+
+    try {
+      firestore
+          .collection(id)
+          .doc("Registros")
+          .collection(atu.ano().toString())
+          .doc(atu.mes().toString())
+          .collection(tipoAtualizacao)
+          .doc(atu.idUnico)
+          .delete();
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  //edit
+  edit(Atualizacao atuAntiga, Atualizacao atuNova) async {
+    try{
+      await delete(atuAntiga);
+      add(atuNova);
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+    }
+  }
 
   //get
   //Lista
-
   Future<List<Atualizacao>> getListaEntradas(DateTime dt) async{
     List<Atualizacao> entradas = [];
 
