@@ -59,6 +59,13 @@ class AdicionarState extends State<Adicionar> {
       _radioButtonSelecionado = widget.atualizacao!.isEntrada
           ? radioButtonList.Entrada
           : radioButtonList.Saida;
+    }else{
+      _controllerNome.text = "";
+      _controllerValor.updateValue(0);
+      _controllerTag.text = "Salario";
+      _controllerData.text = DateFormat(DateFormat.YEAR_NUM_MONTH_DAY, "pt_Br").format(DateTime.now());
+      _controllerObservacao.text = "";
+      _radioButtonSelecionado = radioButtonList.Entrada;
     }
   }
 

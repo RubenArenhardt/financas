@@ -24,7 +24,7 @@ Map<String, double> atualizaGrafico(List<Atualizacao> listaSaida, listaEntrada) 
     return mapa;
   }
 
-  double calculaValor({required BancoDeDados bd, required List<Atualizacao> listaEntrada, listaSaida}) {
+  double calculaValor({required List<Atualizacao> listaEntrada, listaSaida}) {
     double valor = 0;
     for (int i = 0; i < listaEntrada.length; i++) {
       valor = valor + listaEntrada[i].valor;

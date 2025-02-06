@@ -19,11 +19,16 @@ class Inicio extends StatefulWidget {
 
   final Function notify;
 
-  List<Atualizacao> listaEntrada , listaSaida;
+  List<Atualizacao> listaEntrada, listaSaida;
 
   final BancoDeDados bd;
 
-  Inicio({required this.user, required this.notify, required this.listaEntrada, required this.listaSaida, required this.bd});
+  Inicio(
+      {required this.user,
+      required this.notify,
+      required this.listaEntrada,
+      required this.listaSaida,
+      required this.bd});
 
   @override
   State<StatefulWidget> createState() => InicioState(listaEntrada, listaSaida);
@@ -33,13 +38,13 @@ class InicioState extends State<Inicio> {
   List<Atualizacao> listaEntrada = [], listaSaida = [];
 
   InicioState(this.listaEntrada, this.listaSaida);
-  
+
   @override
   Widget build(BuildContext context) {
-      debugPrint(listaEntrada.toString());
+    debugPrint(listaEntrada.toString());
     return Scaffold(
       //
-      appBar: AppBar( 
+      appBar: AppBar(
         title: Text(
           "Na Ponta do Lápis",
           style: TextStyle(fontSize: 24),
@@ -67,12 +72,7 @@ class InicioState extends State<Inicio> {
             Container(
               padding: EdgeInsets.fromLTRB(25, 0, 25, 0),
               child: Text(
-                "R\$" +
-                    (_formatador.format(calculaValor(
-                            bd: widget.bd,
-                            listaEntrada: listaEntrada,
-                            listaSaida: listaSaida)))
-                        .toString(),
+                "R\$${_formatador.format(calculaValor(listaEntrada: listaEntrada, listaSaida: listaSaida))}",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 42,
@@ -96,9 +96,49 @@ class InicioState extends State<Inicio> {
                   legendPosition: LegendPosition.bottom,
                 ),
                 chartValuesOptions: ChartValuesOptions(
-                  showChartValuesInPercentage: false,
+                  showChartValuesInPercentage: true,
                   decimalPlaces: 2,
                 ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(0, 25, 0, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.all(5),
+                      margin: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(1000, 20, 20, 20),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                        child:Text(
+                        "R\$${_formatador.format(calculaValor(listaEntrada: listaEntrada, listaSaida: List.empty()))}",
+                        style: TextStyle(fontSize: 18, color: Colors.green),
+                      ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.all(5),
+                      margin: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(1000, 20, 20, 20),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                        child: Text(
+                        "R\$${_formatador.format(calculaValor(listaEntrada: List.empty(), listaSaida: listaSaida))}",
+                        style: TextStyle(fontSize: 18, color: Colors.red),
+                      ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -112,8 +152,12 @@ class InicioState extends State<Inicio> {
         children: [
           FloatingActionButton(
             onPressed: () async {
-              await Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return Consultar(bd: widget.bd, listaEntrada: listaEntrada, listaSaida: listaSaida);
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) {
+                return Consultar(
+                    bd: widget.bd,
+                    listaEntrada: listaEntrada,
+                    listaSaida: listaSaida);
               }));
               refresh(widget.bd);
             },
@@ -135,11 +179,11 @@ class InicioState extends State<Inicio> {
                       widget.bd.add(atualizacao);
                     });
                     refresh(widget.bd);
-                  }else{
+                  } else {
                     refresh(widget.bd);
                   }
                 });
-              } catch (e) { 
+              } catch (e) {
                 debugPrint(e.toString());
               }
             },

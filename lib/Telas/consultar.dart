@@ -22,6 +22,8 @@ class Consultar extends StatefulWidget {
   }
 }
 
+final NumberFormat _formatador = NumberFormat("#,##0.00", "pt_BR");
+
 class ConsultarState extends State<Consultar> {
   List<Atualizacao> listaEntrada, listaSaida;
 
@@ -29,12 +31,10 @@ class ConsultarState extends State<Consultar> {
 
   ConsultarState(this.listaEntrada, this.listaSaida, this.dt);
 
-  final NumberFormat _formatador = NumberFormat("#,##0.00", "pt_BR");
-
   @override
   Widget build(BuildContext context) {
-    double valorTotal = calculaValor(
-        bd: widget.bd, listaEntrada: listaEntrada, listaSaida: listaSaida);
+    double valorTotal =
+        calculaValor(listaEntrada: listaEntrada, listaSaida: listaSaida);
     String data = dt.month.toString() + "/" + dt.year.toString();
 
     return Scaffold(
@@ -92,6 +92,46 @@ class ConsultarState extends State<Consultar> {
                 showChartValuesInPercentage: false,
                 decimalPlaces: 2,
               ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    margin: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(1000, 20, 20, 20),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "R\$${_formatador.format(calculaValor(listaEntrada: listaEntrada, listaSaida: List.empty()))}",
+                        style: TextStyle(fontSize: 18, color: Colors.green),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    margin: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(1000, 20, 20, 20),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "R\$${_formatador.format(calculaValor(listaEntrada: List.empty(), listaSaida: listaSaida))}",
+                        style: TextStyle(fontSize: 18, color: Colors.red),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Listagem(
@@ -223,18 +263,18 @@ class ItemAtualizacao extends StatelessWidget {
           child: Column(
             children: [
               Row(
-                children: [Text(atualizacao.nome), Text(atualizacao.data)],
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [Text(atualizacao.nome), Text(atualizacao.data)],
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    atualizacao.valor.toString(),
+                    "R\$${_formatador.format(atualizacao.valor).toString()}",
                     style: TextStyle(color: corValorAtu(atualizacao)),
                   ),
                   Text(atualizacao.tag)
                 ],
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
               ),
             ],
           ),
