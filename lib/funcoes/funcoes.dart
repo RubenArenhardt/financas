@@ -1,4 +1,3 @@
-import 'package:financas/fireBase/bancoDeDados.dart';
 import 'package:financas/objetos/atualizacao.dart';
 
 Map<String, double> atualizaGrafico(List<Atualizacao> listaSaida, listaEntrada) {
