@@ -1,11 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable, unused_element, prefer_const_literals_to_create_immutables
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:io';
+
 import 'package:financas/fireBase/bancoDeDados.dart';
 import 'package:financas/funcoes/funcoes.dart';
 import 'package:financas/telas/adicionar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
 
@@ -19,11 +22,16 @@ class Inicio extends StatefulWidget {
 
   final Function notify;
 
-  List<Atualizacao> listaEntrada , listaSaida;
+  List<Atualizacao> listaEntrada, listaSaida;
 
   final BancoDeDados bd;
 
-  Inicio({required this.user, required this.notify, required this.listaEntrada, required this.listaSaida, required this.bd});
+  Inicio(
+      {required this.user,
+      required this.notify,
+      required this.listaEntrada,
+      required this.listaSaida,
+      required this.bd});
 
   @override
   State<StatefulWidget> createState() => InicioState(listaEntrada, listaSaida);
@@ -33,15 +41,14 @@ class InicioState extends State<Inicio> {
   List<Atualizacao> listaEntrada = [], listaSaida = [];
 
   InicioState(this.listaEntrada, this.listaSaida);
-  
+
   @override
   Widget build(BuildContext context) {
-      debugPrint(listaEntrada.toString());
     return Scaffold(
       //
-      appBar: AppBar( 
+      appBar: AppBar(
         title: Text(
-          "Meu App de Finanças Pessoais",
+          "Na Ponta do Lápis",
           style: TextStyle(fontSize: 24),
         ),
         actions: [
@@ -58,25 +65,52 @@ class InicioState extends State<Inicio> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.fromLTRB(25, 25, 25, 0),
-              child: Text(
-                "Saldo",
-                style: TextStyle(fontSize: 28),
+              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(1000, 20, 20, 20),
+                borderRadius: BorderRadiusDirectional.only(
+                    bottomStart: Radius.circular(20),
+                    bottomEnd: Radius.circular(20)),
               ),
-            ),
-            Container(
-              padding: EdgeInsets.fromLTRB(25, 0, 25, 0),
-              child: Text(
-                "R\$" +
-                    (_formatador.format(calculaValor(
-                            bd: widget.bd,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Saldo",
+                          style: TextStyle(
+                            fontSize: 20,
+                            
+                          ),
+                        ),
+                        textoValor(
                             listaEntrada: listaEntrada,
-                            listaSaida: listaSaida)))
-                        .toString(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 42,
-                ),
+                            listaSaida: listaSaida,
+                            style: TextStyle(fontSize: 20)),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        textoValor(
+                          listaEntrada: listaEntrada,
+                          listaSaida: List.empty(),
+                          style: TextStyle(fontSize: 20, color: Colors.green),
+                        ),
+                        textoValor(
+                          listaEntrada: List.empty(),
+                          listaSaida: listaSaida,
+                          style: TextStyle(fontSize: 20, color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
             Container(
@@ -86,21 +120,15 @@ class InicioState extends State<Inicio> {
               ),
             ),
             Container(
-              width: 300,
-              alignment: Alignment.center,
-              child: PieChart(
-                dataMap: atualizaGrafico(listaSaida, listaEntrada),
-                chartType: ChartType.disc,
-                legendOptions: LegendOptions(
-                  showLegendsInRow: true,
+              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                width: 300,
+                alignment: Alignment.center,
+                child: criaPieChart(
+                  listaSaida: listaSaida,
                   legendPosition: LegendPosition.bottom,
-                ),
-                chartValuesOptions: ChartValuesOptions(
-                  showChartValuesInPercentage: true,
-                  decimalPlaces: 0,
-                ),
-              ),
-            ),
+                  legendsInRow: true,
+                )),
+            carregarAnuncio(),
           ],
         ),
       ),
@@ -111,10 +139,15 @@ class InicioState extends State<Inicio> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           FloatingActionButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return Consultar(bd: widget.bd, listaEntrada: listaEntrada,listaSaida: listaSaida,);
+            onPressed: () async {
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) {
+                return Consultar(
+                    bd: widget.bd,
+                    listaEntrada: listaEntrada,
+                    listaSaida: listaSaida);
               }));
+              refresh(widget.bd);
             },
             child: Icon(Icons.remove_red_eye),
             //Por algum motivo ele da erro colocando 2 floatingActionButton
@@ -133,11 +166,12 @@ class InicioState extends State<Inicio> {
                     setState(() {
                       widget.bd.add(atualizacao);
                     });
-                  }else{
+                    refresh(widget.bd);
+                  } else {
                     refresh(widget.bd);
                   }
                 });
-              } catch (e) { 
+              } catch (e) {
                 debugPrint(e.toString());
               }
             },
@@ -151,12 +185,13 @@ class InicioState extends State<Inicio> {
   }
 
   refresh(bd) async {
-    setState(() async {
-      print("inicializando setState");
-      DateTime dt = DateTime.now();
-      listaEntrada = await bd.getListaEntradas(dt);
-      listaSaida = await bd.getListaSaidas(dt);
-      print("finalizando setState");
+    print("inicializando refresh");
+    DateTime dt = DateTime.now();
+    List<Atualizacao> entradas = await bd.getListaEntradas(dt);
+    List<Atualizacao> saidas = await bd.getListaSaidas(dt);
+    setState(() {
+      listaEntrada = entradas;
+      listaSaida = saidas;
     });
   }
 }
