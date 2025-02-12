@@ -85,14 +85,10 @@ class ConsultarState extends State<Consultar> {
             width: 400,
             height: 300,
             alignment: Alignment.center,
-            child: PieChart(
-              dataMap: atualizaGrafico(listaSaida, listaEntrada),
-              chartType: ChartType.disc,
-              chartValuesOptions: const ChartValuesOptions(
-                showChartValuesInPercentage: false,
-                decimalPlaces: 2,
-              ),
-            ),
+            child: criaPieChart(
+              listaSaida: listaSaida, 
+              legendPosition: LegendPosition.right,
+              isPersantage: false)
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(0, 0, 0, 15),

@@ -1,11 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable, unused_element, prefer_const_literals_to_create_immutables
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:io';
+
 import 'package:financas/fireBase/bancoDeDados.dart';
 import 'package:financas/funcoes/funcoes.dart';
 import 'package:financas/telas/adicionar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
 
@@ -41,7 +44,6 @@ class InicioState extends State<Inicio> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(listaEntrada.toString());
     return Scaffold(
       //
       appBar: AppBar(
@@ -63,20 +65,52 @@ class InicioState extends State<Inicio> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.fromLTRB(25, 25, 25, 0),
-              child: Text(
-                "Saldo",
-                style: TextStyle(fontSize: 28),
+              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(1000, 20, 20, 20),
+                borderRadius: BorderRadiusDirectional.only(
+                    bottomStart: Radius.circular(20),
+                    bottomEnd: Radius.circular(20)),
               ),
-            ),
-            Container(
-              padding: EdgeInsets.fromLTRB(25, 0, 25, 0),
-              child: Text(
-                "R\$${_formatador.format(calculaValor(listaEntrada: listaEntrada, listaSaida: listaSaida))}",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 42,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Saldo",
+                          style: TextStyle(
+                            fontSize: 20,
+                            
+                          ),
+                        ),
+                        textoValor(
+                            listaEntrada: listaEntrada,
+                            listaSaida: listaSaida,
+                            style: TextStyle(fontSize: 20)),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        textoValor(
+                          listaEntrada: listaEntrada,
+                          listaSaida: List.empty(),
+                          style: TextStyle(fontSize: 20, color: Colors.green),
+                        ),
+                        textoValor(
+                          listaEntrada: List.empty(),
+                          listaSaida: listaSaida,
+                          style: TextStyle(fontSize: 20, color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
             Container(
@@ -86,61 +120,15 @@ class InicioState extends State<Inicio> {
               ),
             ),
             Container(
-              width: 300,
-              alignment: Alignment.center,
-              child: PieChart(
-                dataMap: atualizaGrafico(listaSaida, listaEntrada),
-                chartType: ChartType.disc,
-                legendOptions: LegendOptions(
-                  showLegendsInRow: true,
+              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                width: 300,
+                alignment: Alignment.center,
+                child: criaPieChart(
+                  listaSaida: listaSaida,
                   legendPosition: LegendPosition.bottom,
-                ),
-                chartValuesOptions: ChartValuesOptions(
-                  showChartValuesInPercentage: true,
-                  decimalPlaces: 2,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 25, 0, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(5),
-                      margin: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(1000, 20, 20, 20),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child:Text(
-                        "R\$${_formatador.format(calculaValor(listaEntrada: listaEntrada, listaSaida: List.empty()))}",
-                        style: TextStyle(fontSize: 18, color: Colors.green),
-                      ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(5),
-                      margin: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(1000, 20, 20, 20),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Text(
-                        "R\$${_formatador.format(calculaValor(listaEntrada: List.empty(), listaSaida: listaSaida))}",
-                        style: TextStyle(fontSize: 18, color: Colors.red),
-                      ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                  legendsInRow: true,
+                )),
+            carregarAnuncio(),
           ],
         ),
       ),
