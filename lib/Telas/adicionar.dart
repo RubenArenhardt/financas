@@ -1,9 +1,12 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, equal_keys_in_map
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 
 import 'package:financas/objetos/atualizacao.dart';
@@ -47,6 +50,14 @@ class Adicionar extends StatefulWidget {
 }
 
 class AdicionarState extends State<Adicionar> {
+
+  final _adUnitId = Platform.isAndroid
+    ? 'ca-app-pub-3940256099942544/9214589741'
+    : 'ca-app-pub-3940256099942544/2435281174';
+
+  BannerAd? _bannerAd;
+  bool _isLoaded = false;
+
   @override
   void initState() {
     super.initState();
@@ -71,6 +82,7 @@ class AdicionarState extends State<Adicionar> {
 
   @override
   Widget build(BuildContext context) {
+    _initializeMobileAdsSDK();
     return MaterialApp(
       localizationsDelegates: [
         GlobalWidgetsLocalizations.delegate,
@@ -83,15 +95,12 @@ class AdicionarState extends State<Adicionar> {
       theme: ThemeData.dark().copyWith(
           scaffoldBackgroundColor: const Color.fromARGB(255, 18, 32, 47)),
       home: Scaffold(
-        //
-        //
+        
         appBar: AppBar(
           title: Text(widget.atualizacao == null
               ? "Adicionar Entrada/Saída"
               : "Editar Entrada/Saída"),
         ),
-        //
-        //
         body: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.all(10),
@@ -106,7 +115,7 @@ class AdicionarState extends State<Adicionar> {
                     ),
                   ),
                 ),
-                //
+                
                 Center(
                   child: RadioButton(
                     onChanged: (radioButtonList? value) {
@@ -116,7 +125,7 @@ class AdicionarState extends State<Adicionar> {
                     },
                   ),
                 ),
-                //
+
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 30, 0, 10),
                   child: DropdownMenuTag(),
@@ -134,8 +143,7 @@ class AdicionarState extends State<Adicionar> {
                     keyboardType: TextInputType.number,
                   ),
                 ),
-                //
-                //
+                
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 0, 0, 30),
                   child: SelecionarData(),
@@ -150,11 +158,22 @@ class AdicionarState extends State<Adicionar> {
                     ),
                   ),
                 ),
+                if (_bannerAd != null && _isLoaded)
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SafeArea(
+                  child: SizedBox(
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd!),
+                  ),
+                ),
+              )
               ],
             ),
           ),
         ),
-        //
+        
         persistentFooterButtons: [
           Row(
             children: [
@@ -208,6 +227,52 @@ class AdicionarState extends State<Adicionar> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  void _initializeMobileAdsSDK() async {
+    // Inicializa o SDK do Google Mobile Ads.
+    MobileAds.instance.initialize();
+    // Carrega o banner ad.
+    _loadAd();
+  }
+
+  void _loadAd() async {
+    //Captura o tamanho da tela
+    final size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+        MediaQuery.sizeOf(context).width.truncate());
+
+    if (size == null) {
+      //Nao foi possivel carregar o tamanho do banner
+      return;
+    }
+
+    BannerAd(
+      adUnitId: _adUnitId,
+      request: const AdRequest(),
+      size: size,
+      listener: BannerAdListener(
+        // Chama quando o banner é carregado
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+            _isLoaded = true;
+          });
+        },
+        // Chama quando o banner falha ao carregar  
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
+        },
+        // Chama quando o banner é clicado
+        onAdOpened: (ad) {},
+      ),
+    ).load();
+  }
+
 }
 
 class RadioButton extends StatefulWidget {

@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:financas/objetos/atualizacao.dart';
 import 'package:flutter/foundation.dart';
@@ -6,6 +8,9 @@ import 'package:flutter/foundation.dart';
 class BancoDeDados {
   final String id;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final _adUnitId = Platform.isAndroid
+    ? 'ca-app-pub-3940256099942544/9214589741'
+    : 'ca-app-pub-3940256099942544/2435281174';
 
   BancoDeDados({
     required this.id,
@@ -122,4 +127,8 @@ class BancoDeDados {
 
     return saidas;
   }
+  getBannerAdUnitId() {
+    return _adUnitId;
+  }
 }
+

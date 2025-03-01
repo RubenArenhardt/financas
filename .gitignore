@@ -54,6 +54,3 @@ app.*.map.json
 google-services.json
 firebase-debug.log
 service-account.json
-firebase_options.dart
-
-android/app/src/main/AndroidManifest.xml

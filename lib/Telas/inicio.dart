@@ -8,9 +8,9 @@ import 'package:financas/funcoes/funcoes.dart';
 import 'package:financas/telas/adicionar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:financas/objetos/atualizacao.dart';
 import 'package:financas/telas/consultar.dart';
@@ -42,13 +42,17 @@ class InicioState extends State<Inicio> {
 
   InicioState(this.listaEntrada, this.listaSaida);
 
+  BannerAd? _bannerAd;
+  bool _isLoaded = false;
+
   @override
   Widget build(BuildContext context) {
+    _initializeMobileAdsSDK();
     return Scaffold(
       //
       appBar: AppBar(
         title: Text(
-          "Na Ponta do Lápis",
+          "Na Ponta da Caneta",
           style: TextStyle(fontSize: 24),
         ),
         actions: [
@@ -83,7 +87,6 @@ class InicioState extends State<Inicio> {
                           "Saldo",
                           style: TextStyle(
                             fontSize: 20,
-                            
                           ),
                         ),
                         textoValor(
@@ -121,14 +124,25 @@ class InicioState extends State<Inicio> {
             ),
             Container(
               margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                width: 300,
-                alignment: Alignment.center,
-                child: criaPieChart(
-                  listaSaida: listaSaida,
-                  legendPosition: LegendPosition.bottom,
-                  legendsInRow: true,
-                )),
-            carregarAnuncio(),
+              width: 300,
+              alignment: Alignment.center,
+              child: criaPieChart(
+                listaSaida: listaSaida,
+                legendPosition: LegendPosition.bottom,
+                legendsInRow: true,
+              ),
+            ),
+            if (_bannerAd != null && _isLoaded)
+              Align(
+                alignment: Alignment.topCenter,
+                child: SafeArea(
+                  child: SizedBox(
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd!),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -184,6 +198,12 @@ class InicioState extends State<Inicio> {
     );
   }
 
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
   refresh(bd) async {
     print("inicializando refresh");
     DateTime dt = DateTime.now();
@@ -194,4 +214,44 @@ class InicioState extends State<Inicio> {
       listaSaida = saidas;
     });
   }
+
+  void _initializeMobileAdsSDK() async {
+    // Inicializa o SDK do Google Mobile Ads.
+    MobileAds.instance.initialize();
+    // Carrega o banner ad.
+    _loadAd();
+  }
+
+  void _loadAd() async {
+    //Captura o tamanho da tela
+    final size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+        MediaQuery.sizeOf(context).width.truncate());
+
+    if (size == null) {
+      //Nao foi possivel carregar o tamanho do banner
+      return;
+    }
+
+    BannerAd(
+      adUnitId: widget.bd.getBannerAdUnitId(),
+      request: const AdRequest(),
+      size: size,
+      listener: BannerAdListener(
+        // Chama quando o banner é carregado
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+            _isLoaded = true;
+          });
+        },
+        // Chama quando o banner falha ao carregar  
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
+        },
+        // Chama quando o banner é clicado
+        onAdOpened: (ad) {},
+      ),
+    ).load();
+  }
+
 }

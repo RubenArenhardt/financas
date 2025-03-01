@@ -1,6 +1,5 @@
 import 'package:financas/objetos/atualizacao.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
 
@@ -61,76 +60,6 @@ criaPieChart(
       ),
     );
   }
-}
-
-carregarAnuncio() {
-  NativeAd? _nativeAd;
-  bool _nativeAdIsLoaded = false;
-
-  final String _adUnitId = 'ca-app-pub-3940256099942544/2247696110';
-
-  NativeAd loadAd() {
-    return _nativeAd = NativeAd(
-        adUnitId: _adUnitId,
-        listener: NativeAdListener(
-          onAdLoaded: (ad) {
-            debugPrint('$NativeAd loaded.');
-            _nativeAdIsLoaded = true;
-          },
-          onAdFailedToLoad: (ad, error) {
-            // Dispose the ad here to free resources.
-            debugPrint('$NativeAd failed to load: $error');
-            ad.dispose();
-          },
-          // Called when a click is recorded for a NativeAd.
-          onAdClicked: (ad) {},
-          // Called when an impression occurs on the ad.
-          onAdImpression: (ad) {},
-          // Called when an ad removes an overlay that covers the screen.
-          onAdClosed: (ad) {},
-          // Called when an ad opens an overlay that covers the screen.
-          onAdOpened: (ad) {},
-        ),
-        request: const AdRequest(),
-        // Styling
-        nativeTemplateStyle: NativeTemplateStyle(
-            // Required: Choose a template.
-            templateType: TemplateType.medium,
-            // Optional: Customize the ad's style.
-            mainBackgroundColor: Colors.purple,
-            cornerRadius: 10.0,
-            callToActionTextStyle: NativeTemplateTextStyle(
-                textColor: Colors.cyan,
-                backgroundColor: Colors.red,
-                style: NativeTemplateFontStyle.monospace,
-                size: 16.0),
-            primaryTextStyle: NativeTemplateTextStyle(
-                textColor: Colors.red,
-                backgroundColor: Colors.cyan,
-                style: NativeTemplateFontStyle.italic,
-                size: 16.0),
-            secondaryTextStyle: NativeTemplateTextStyle(
-                textColor: Colors.green,
-                backgroundColor: Colors.black,
-                style: NativeTemplateFontStyle.bold,
-                size: 16.0),
-            tertiaryTextStyle: NativeTemplateTextStyle(
-                textColor: Colors.brown,
-                backgroundColor: Colors.amber,
-                style: NativeTemplateFontStyle.normal,
-                size: 16.0)))
-      ..load();
-  }
-
-  return ConstrainedBox(
-    constraints: const BoxConstraints(
-      minWidth: 320, // minimum recommended width
-      minHeight: 90, // minimum recommended height
-      maxWidth: 400,
-      maxHeight: 90,
-    ),
-    child: AdWidget(ad: loadAd()),
-  );
 }
 
 textoValor(
