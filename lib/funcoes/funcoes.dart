@@ -81,3 +81,11 @@ textoValor(
     ),
   );
 }
+
+DateTime voltaMes(DateTime dt){
+  return DateFormat("dd/MM/yyyy").parse("01/${dt.month-1}/${dt.year}");
+}
+
+DateTime passaMes(DateTime dt){
+  return DateFormat("dd/MM/yyyy").parse("01/${dt.month+1}/${dt.year}");
+}

@@ -56,7 +56,7 @@ class ConsultarState extends State<Consultar> {
               IconButton(
                 onPressed: () {
                   setState(() {
-                    dt = dt.subtract(Duration(days: 30));
+                    dt = voltaMes(dt);
                     refresh(bd: widget.bd, dt: dt);
                   });
                 },
@@ -69,7 +69,7 @@ class ConsultarState extends State<Consultar> {
               IconButton(
                 onPressed: () {
                   setState(() {
-                    dt = dt.add(Duration(days: 30));
+                    dt = passaMes(dt);
                     refresh(bd: widget.bd, dt: dt);
                   });
                 },

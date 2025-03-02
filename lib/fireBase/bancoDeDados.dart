@@ -127,8 +127,14 @@ class BancoDeDados {
 
     return saidas;
   }
+  
+  //para utilizar o msm ID em diferentes paginas
   getBannerAdUnitId() {
     return _adUnitId;
+  }
+  
+  apagaBanco(){
+    firestore.collection(id).doc("Registros").delete();
   }
 }
 

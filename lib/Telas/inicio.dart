@@ -1,8 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable, unused_element, prefer_const_literals_to_create_immutables
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:io';
-
 import 'package:financas/fireBase/bancoDeDados.dart';
 import 'package:financas/funcoes/funcoes.dart';
 import 'package:financas/telas/adicionar.dart';
@@ -49,21 +47,13 @@ class InicioState extends State<Inicio> {
   Widget build(BuildContext context) {
     _initializeMobileAdsSDK();
     return Scaffold(
-      //
+      drawer: Menu(notify:widget.notify, bd: widget.bd,),
       appBar: AppBar(
         title: Text(
-          "Na Ponta da Caneta",
+          "Na Ponta do Lápis",
           style: TextStyle(fontSize: 24),
         ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                widget.notify(null, true);
-              },
-              icon: Icon(Icons.logout))
-        ],
       ),
-      //
       body: SizedBox.expand(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -254,4 +244,37 @@ class InicioState extends State<Inicio> {
     ).load();
   }
 
+}
+
+class Menu extends StatelessWidget {
+
+  final Function notify;
+  final BancoDeDados bd;
+
+  Menu({required this.notify, required this.bd});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: [
+          DrawerHeader(child: Text("Menu")),
+          ListTile(
+            title: Text("Deixe seu feedback"),
+          ),
+          ListTile(
+            title: Text("Excluir Dados"),
+            onTap: bd.apagaBanco,
+          ),
+          ListTile(
+            leading: Icon(Icons.logout),
+            title: Text("Logout"),
+            onTap: () {
+                notify(null, true);
+              },
+          ),
+        ],
+      )
+    );
+  }
 }
