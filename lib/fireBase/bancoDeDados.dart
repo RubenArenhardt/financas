@@ -9,8 +9,8 @@ class BancoDeDados {
   final String id;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final _adUnitId = Platform.isAndroid
-    ? 'ca-app-pub-3940256099942544/9214589741'
-    : 'ca-app-pub-3940256099942544/2435281174';
+      ? 'ca-app-pub-3940256099942544/9214589741'
+      : 'ca-app-pub-3940256099942544/2435281174';
 
   BancoDeDados({
     required this.id,
@@ -64,7 +64,7 @@ class BancoDeDados {
 
   //edit
   edit(Atualizacao atuAntiga, Atualizacao atuNova) async {
-    try{
+    try {
       await delete(atuAntiga);
       add(atuNova);
     } on Exception catch (e) {
@@ -74,13 +74,13 @@ class BancoDeDados {
 
   //get
   //Lista
-  Future<List<Atualizacao>> getListaEntradas(DateTime dt) async{
+  Future<List<Atualizacao>> getListaEntradas(DateTime dt) async {
     List<Atualizacao> entradas = [];
 
     try {
-      //await necessario para esperar terminar a 
+      //await necessario para esperar terminar a
       //busca no banco antes de devolver a lista
-       await firestore
+      await firestore
           .collection(id)
           .doc("Registros")
           .collection(dt.year.toString())
@@ -127,14 +127,24 @@ class BancoDeDados {
 
     return saidas;
   }
-  
+
   //para utilizar o msm ID em diferentes paginas
   getBannerAdUnitId() {
     return _adUnitId;
   }
-  
-  apagaBanco(){
+
+  apagaBanco() {
     firestore.collection(id).doc("Registros").delete();
   }
-}
 
+  Future<List<Map<String,dynamic>>> getFuturo() async {
+    List<Map<String, dynamic>> lista = [];
+    firestore.collection("Futuro").get().then((snapshot) {
+      List l = snapshot.docs;
+      for (int i = 0; i < l.length; i++) {
+        lista.add(l[i].data());
+      }
+    });
+    return lista;
+  }
+}

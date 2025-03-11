@@ -4,6 +4,7 @@
 import 'package:financas/fireBase/bancoDeDados.dart';
 import 'package:financas/funcoes/funcoes.dart';
 import 'package:financas/telas/adicionar.dart';
+import 'package:financas/telas/futuro.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -250,6 +251,7 @@ class Menu extends StatelessWidget {
 
   final Function notify;
   final BancoDeDados bd;
+  
 
   Menu({required this.notify, required this.bd});
 
@@ -258,9 +260,19 @@ class Menu extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
-          DrawerHeader(child: Text("Menu")),
+          ListTile(title: Text("Menu",style: TextStyle(),)),
+          ListTile(
+            title: Text("O que vem por ai?"),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return Futuro(bd: bd,);}));
+            },
+          ),
           ListTile(
             title: Text("Deixe seu feedback"),
+            onTap: (){
+
+            },
           ),
           ListTile(
             title: Text("Excluir Dados"),
