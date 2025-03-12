@@ -4,6 +4,7 @@
 import 'package:financas/fireBase/bancoDeDados.dart';
 import 'package:financas/funcoes/funcoes.dart';
 import 'package:financas/telas/adicionar.dart';
+import 'package:financas/telas/feedback.dart';
 import 'package:financas/telas/futuro.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +52,7 @@ class InicioState extends State<Inicio> {
       drawer: Menu(notify:widget.notify, bd: widget.bd,),
       appBar: AppBar(
         title: Text(
-          "Na Ponta do Lápis",
+          "Ponta do Lápis",
           style: TextStyle(fontSize: 24),
         ),
       ),
@@ -265,13 +266,16 @@ class Menu extends StatelessWidget {
             title: Text("O que vem por ai?"),
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return Futuro(bd: bd,);}));
+                return Futuro(bd: bd,);
+                }));
             },
           ),
           ListTile(
             title: Text("Deixe seu feedback"),
             onTap: (){
-
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return FeedbackPage(bd: bd);
+              }));
             },
           ),
           ListTile(

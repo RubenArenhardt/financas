@@ -9,7 +9,7 @@ class BancoDeDados {
   final String id;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final _adUnitId = Platform.isAndroid
-      ? 'ca-app-pub-3940256099942544/9214589741'
+      ? 'ca-app-pub-7976065858956466/6790330121'
       : 'ca-app-pub-3940256099942544/2435281174';
 
   BancoDeDados({
@@ -147,4 +147,10 @@ class BancoDeDados {
     });
     return lista;
   }
+
+  addFeedback(String feedback) {
+    firestore.collection("Feedback").add({"Feedback": feedback});
+  }
+
+
 }

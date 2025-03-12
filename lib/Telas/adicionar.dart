@@ -22,7 +22,8 @@ final MoneyMaskedTextController _controllerValor =
 
 Map<String,radioButtonList> tags = {
   "Salario":radioButtonList.Entrada,
-  "Investimento":radioButtonList.Entrada,
+  "Invest":radioButtonList.Entrada,
+  "Investimento":radioButtonList.Saida,
   "Mercado":radioButtonList.Saida,
   "Transporte":radioButtonList.Saida,
   "Comida":radioButtonList.Saida,
@@ -52,7 +53,7 @@ class Adicionar extends StatefulWidget {
 class AdicionarState extends State<Adicionar> {
 
   final _adUnitId = Platform.isAndroid
-    ? 'ca-app-pub-3940256099942544/9214589741'
+    ? 'ca-app-pub-7976065858956466/6790330121'
     : 'ca-app-pub-3940256099942544/2435281174';
 
   BannerAd? _bannerAd;

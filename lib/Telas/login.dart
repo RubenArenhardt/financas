@@ -85,7 +85,7 @@ class FazerLogin extends StatelessWidget {
             children: [
               Image(image: AssetImage("assets/logo.png"),height: 200,),
               SizedBox(height: 10),
-              Text("Na Ponta da Caneta", style: TextStyle(fontSize: 24)),
+              Text("Ponta do Lápis", style: TextStyle(fontSize: 24)),
               SizedBox(height: 10),
               TextButton(
                 onPressed: () async {
