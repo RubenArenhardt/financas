@@ -1,0 +1,2 @@
+C:/Users/Omega/Documents/Projetos VSCode/financas/android/app/.cxx/RelWithDebInfo/576r6h4b/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Omega/Documents/Projetos VSCode/financas/android/app/.cxx/RelWithDebInfo/576r6h4b/armeabi-v7a/CMakeFiles/rebuild_cache.dir
