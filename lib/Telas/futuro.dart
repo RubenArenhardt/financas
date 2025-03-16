@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class Futuro extends StatefulWidget {
-  BancoDeDados bd;
+  final BancoDeDados bd;
   Futuro({required this.bd});
 
   @override
@@ -40,7 +40,7 @@ class FuturoState extends State<Futuro> {
 }
 
 class FuturoItem extends StatelessWidget {
-  Map<String, dynamic> item;
+  final Map<String, dynamic> item;
 
   FuturoItem({required this.item});
 
