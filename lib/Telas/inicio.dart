@@ -197,7 +197,7 @@ class InicioState extends State<Inicio> {
   }
 
   refresh(bd) async {
-    print("inicializando refresh");
+    debugPrint("inicializando refresh");
     DateTime dt = DateTime.now();
     List<Atualizacao> entradas = await bd.getListaEntradas(dt);
     List<Atualizacao> saidas = await bd.getListaSaidas(dt);
@@ -261,7 +261,7 @@ class Menu extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
-          ListTile(title: Text("Menu",style: TextStyle(),)),
+          ListTile(title: Center(child: Text("Menu",style: TextStyle(fontWeight: FontWeight.bold, ),),),),
           ListTile(
             title: Text("O que vem por ai?"),
             onTap: () {

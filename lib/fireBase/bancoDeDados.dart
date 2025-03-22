@@ -134,7 +134,11 @@ class BancoDeDados {
   }
 
   apagaBanco() {
-    firestore.collection(id).doc("Registros").delete();
+    try{
+      firestore.collection(id).doc("Registros").delete();
+    }catch(e){
+      debugPrint(e.toString());
+    }
   }
 
   Future<List<Map<String,dynamic>>> getFuturo() async {

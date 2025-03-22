@@ -20,21 +20,22 @@ radioButtonList? _radioButtonSelecionado = radioButtonList.Entrada;
 final MoneyMaskedTextController _controllerValor =
     MoneyMaskedTextController(leftSymbol: 'R\$ ');
 
-Map<String,radioButtonList> tags = {
-  "Salario":radioButtonList.Entrada,
-  "Invest":radioButtonList.Entrada,
-  "Investimento":radioButtonList.Saida,
-  "Mercado":radioButtonList.Saida,
-  "Transporte":radioButtonList.Saida,
-  "Comida":radioButtonList.Saida,
-  "Casa":radioButtonList.Saida,
-  "Lazer":radioButtonList.Saida,
-  "Outras Entradas":radioButtonList.Entrada,
-  "Outras Saídas":radioButtonList.Saida
-};
+List<String> tagsEntrada = [
+  "Salario",
+  "Investimento",
+  "Outras Entradas",
+], tagsSaida = [
+  "Investimento",
+  "Mercado",
+  "Transporte",
+  "Comida",
+  "Casa",
+  "Lazer",
+  "Outras Saídas",
+];
 
 final TextEditingController _controllerTag = TextEditingController();
-
+String tagAnterior = "";
 final TextEditingController _controllerData = TextEditingController(
     text: DateFormat(DateFormat.YEAR_NUM_MONTH_DAY, "pt_Br")
         .format(DateTime.now()));
@@ -51,13 +52,14 @@ class Adicionar extends StatefulWidget {
 }
 
 class AdicionarState extends State<Adicionar> {
-
   final _adUnitId = Platform.isAndroid
-    ? 'ca-app-pub-7976065858956466/6790330121'
-    : 'ca-app-pub-3940256099942544/2435281174';
+      ? 'ca-app-pub-7976065858956466/6790330121'
+      : 'ca-app-pub-3940256099942544/2435281174';
 
   BannerAd? _bannerAd;
   bool _isLoaded = false;
+
+  
 
   @override
   void initState() {
@@ -66,16 +68,18 @@ class AdicionarState extends State<Adicionar> {
       _controllerNome.text = widget.atualizacao!.nome;
       _controllerValor.updateValue(widget.atualizacao!.valor);
       _controllerTag.text = widget.atualizacao!.tag;
+      tagAnterior = widget.atualizacao!.tag;
       _controllerData.text = widget.atualizacao!.data;
       _controllerObservacao.text = widget.atualizacao!.observacao;
       _radioButtonSelecionado = widget.atualizacao!.isEntrada
           ? radioButtonList.Entrada
           : radioButtonList.Saida;
-    }else{
+    } else {
       _controllerNome.text = "";
       _controllerValor.updateValue(0);
       _controllerTag.text = "Salario";
-      _controllerData.text = DateFormat(DateFormat.YEAR_NUM_MONTH_DAY, "pt_Br").format(DateTime.now());
+      _controllerData.text = DateFormat(DateFormat.YEAR_NUM_MONTH_DAY, "pt_Br")
+          .format(DateTime.now());
       _controllerObservacao.text = "";
       _radioButtonSelecionado = radioButtonList.Entrada;
     }
@@ -96,7 +100,6 @@ class AdicionarState extends State<Adicionar> {
       theme: ThemeData.dark().copyWith(
           scaffoldBackgroundColor: const Color.fromARGB(255, 18, 32, 47)),
       home: Scaffold(
-        
         appBar: AppBar(
           title: Text(widget.atualizacao == null
               ? "Adicionar Entrada/Saída"
@@ -116,7 +119,7 @@ class AdicionarState extends State<Adicionar> {
                     ),
                   ),
                 ),
-                
+
                 Center(
                   child: RadioButton(
                     onChanged: (radioButtonList? value) {
@@ -144,7 +147,7 @@ class AdicionarState extends State<Adicionar> {
                     keyboardType: TextInputType.number,
                   ),
                 ),
-                
+
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 0, 0, 30),
                   child: SelecionarData(),
@@ -160,21 +163,20 @@ class AdicionarState extends State<Adicionar> {
                   ),
                 ),
                 if (_bannerAd != null && _isLoaded)
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: SafeArea(
-                  child: SizedBox(
-                    width: _bannerAd!.size.width.toDouble(),
-                    height: _bannerAd!.size.height.toDouble(),
-                    child: AdWidget(ad: _bannerAd!),
-                  ),
-                ),
-              )
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SafeArea(
+                      child: SizedBox(
+                        width: _bannerAd!.size.width.toDouble(),
+                        height: _bannerAd!.size.height.toDouble(),
+                        child: AdWidget(ad: _bannerAd!),
+                      ),
+                    ),
+                  )
               ],
             ),
           ),
         ),
-        
         persistentFooterButtons: [
           Row(
             children: [
@@ -182,18 +184,18 @@ class AdicionarState extends State<Adicionar> {
                 Expanded(
                   child: TextButton(
                     onPressed: () {
-                      final Atualizacao atualizacao = _criaAtualizacao();
-                      Navigator.pop(context, atualizacao);
+                      Navigator.pop(context);
                     },
-                    child: Text("Confirmar"),
+                    child: Text("Cancelar"),
                   ),
                 ),
                 Expanded(
                   child: TextButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      final Atualizacao atualizacao = _criaAtualizacao();
+                      Navigator.pop(context, atualizacao);
                     },
-                    child: Text("Cancelar"),
+                    child: Text("Confirmar"),
                   ),
                 ),
               ] else ...[
@@ -264,7 +266,7 @@ class AdicionarState extends State<Adicionar> {
             _isLoaded = true;
           });
         },
-        // Chama quando o banner falha ao carregar  
+        // Chama quando o banner falha ao carregar
         onAdFailedToLoad: (ad, err) {
           ad.dispose();
         },
@@ -273,7 +275,6 @@ class AdicionarState extends State<Adicionar> {
       ),
     ).load();
   }
-
 }
 
 class RadioButton extends StatefulWidget {
@@ -335,22 +336,22 @@ class DropdownMenuTag extends StatefulWidget {
 class _TagState extends State<DropdownMenuTag> {
   @override
   Widget build(BuildContext context) {
-    List<String> filteredTags = tags.entries
-        .where((entry) => entry.value == (_isEntrada() ? radioButtonList.Entrada : radioButtonList.Saida))
-        .map((entry) => entry.key)
-        .toList();
-
-        print(filteredTags);
-
+    List<String> tagsFiltradas = (_isEntrada() ? tagsEntrada : tagsSaida);
+    String tagSelecionada;
+    if (tagAnterior != "") {
+      tagSelecionada = tagAnterior;
+    }else{
+      tagSelecionada = tagsFiltradas.first;
+    }
     return DropdownMenu<String>(
       controller: _controllerTag,
-      initialSelection: filteredTags.first,
+      initialSelection: tagSelecionada,
       onSelected: (String? value) {
         setState(() {
           _controllerTag.text = value!;
         });
       },
-      dropdownMenuEntries: filteredTags.map((tag) {
+      dropdownMenuEntries: tagsFiltradas.map((tag) {
         return DropdownMenuEntry<String>(value: tag, label: tag);
       }).toList(),
     );
@@ -417,5 +418,5 @@ Atualizacao _criaAtualizacao() {
 }
 
 bool _isEntrada() {
-    return _radioButtonSelecionado == radioButtonList.Entrada;
-  }
+  return _radioButtonSelecionado == radioButtonList.Entrada;
+}

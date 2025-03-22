@@ -6,7 +6,7 @@ import 'package:pie_chart/pie_chart.dart';
 Map<String, double> atualizaGrafico(List<Atualizacao> listaSaida) {
   Map<String, double> mapa = ({});
 
-  if (listaSaida.length == 0) {
+  if (listaSaida.isEmpty) {
     mapa = ({"Sem dados suficientes": 1});
   } else {
     final int tamanho = listaSaida.length;
@@ -15,10 +15,13 @@ Map<String, double> atualizaGrafico(List<Atualizacao> listaSaida) {
 
     for (int i = 0; i < tamanho; i++) {
       Atualizacao temp = listaSaida[i];
-
-      temp.tag;
-      temp.valor;
-      Map<String, double> mTemp = ({temp.tag: temp.valor});
+      Map<String, double> mTemp;
+      if(mapa.containsKey(temp.tag)){
+        double valor = mapa[temp.tag]! + temp.valor;
+        mTemp = ({temp.tag: valor});
+      }else{
+        mTemp = ({temp.tag: temp.valor});
+      }
       mapa.addEntries(mTemp.entries);
     }
   }
@@ -41,8 +44,8 @@ criaPieChart(
     LegendPosition legendPosition = LegendPosition.right,
     bool isPersantage = true,
     bool legendsInRow = false}) {
-  if (listaSaida.length == 0) {
-    return Image(
+  if (listaSaida.isEmpty) {
+    return const Image(
       image: AssetImage("assets/semDados.png"),
       height: 200,
     );
@@ -69,14 +72,14 @@ textoValor(
     EdgeInsets? padding,
     EdgeInsets? margin,
     BoxDecoration? decoration}) {
-  final NumberFormat _formatador = NumberFormat("#,##0.00", "pt_BR");
+  final NumberFormat formatador = NumberFormat("#,##0.00", "pt_BR");
 
   return Container(
     padding: padding,
     margin: margin,
     decoration: decoration,
     child: Text(
-      "R\$${_formatador.format(calculaValor(listaEntrada: listaEntrada, listaSaida: listaSaida))}",
+      "R\$${formatador.format(calculaValor(listaEntrada: listaEntrada, listaSaida: listaSaida))}",
       style: style,
     ),
   );
