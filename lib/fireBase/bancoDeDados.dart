@@ -133,15 +133,11 @@ class BancoDeDados {
     return _adUnitId;
   }
 
-  apagaBanco() {
-    try{
-      firestore.collection(id).doc("Registros").delete();
-    }catch(e){
-      debugPrint(e.toString());
-    }
+  apagaBanco() async {
+    
   }
 
-  Future<List<Map<String,dynamic>>> getFuturo() async {
+  Future<List<Map<String, dynamic>>> getFuturo() async {
     List<Map<String, dynamic>> lista = [];
     firestore.collection("Futuro").get().then((snapshot) {
       List l = snapshot.docs;
@@ -153,30 +149,21 @@ class BancoDeDados {
   }
 
   addFeedback(String feedback) {
-    firestore.collection("Feedback").add({"Feedback": feedback});
+    try {
+      firestore.collection("Feedback").add({"Feedback": feedback});
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   //in progress
-  getAllAtualizacao()async{
-
+  getAllAtualizacao() async {
     final List<Atualizacao> listaEntrada = [], listaSaida = [];
-    
 
     firestore.collection(id).get().then((snapshot) {
-
-      snapshot.docs.forEach((lista){
-
-        lista.data().forEach((key, value){
-
-
-
-        });
-        
+      snapshot.docs.forEach((lista) {
+        lista.data().forEach((key, value) {});
       });
-      
     });
-
-
   }
-
 }

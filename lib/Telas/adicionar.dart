@@ -413,7 +413,7 @@ Atualizacao _criaAtualizacao() {
       data: data,
       observacao: obs,
       idUnico: DateTime.now().microsecondsSinceEpoch.toString());
-  print(atualizacao.toString());
+  debugPrint(atualizacao.toString());
   return atualizacao;
 }
 
