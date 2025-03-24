@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:financas/objetos/atualizacao.dart';
 import 'package:flutter/foundation.dart';
@@ -6,6 +8,9 @@ import 'package:flutter/foundation.dart';
 class BancoDeDados {
   final String id;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final _adUnitId = Platform.isAndroid
+      ? 'ca-app-pub-7976065858956466/6790330121'
+      : 'ca-app-pub-3940256099942544/2435281174';
 
   BancoDeDados({
     required this.id,
@@ -59,7 +64,7 @@ class BancoDeDados {
 
   //edit
   edit(Atualizacao atuAntiga, Atualizacao atuNova) async {
-    try{
+    try {
       await delete(atuAntiga);
       add(atuNova);
     } on Exception catch (e) {
@@ -69,13 +74,13 @@ class BancoDeDados {
 
   //get
   //Lista
-  Future<List<Atualizacao>> getListaEntradas(DateTime dt) async{
+  Future<List<Atualizacao>> getListaEntradas(DateTime dt) async {
     List<Atualizacao> entradas = [];
 
     try {
-      //await necessario para esperar terminar a 
+      //await necessario para esperar terminar a
       //busca no banco antes de devolver a lista
-       await firestore
+      await firestore
           .collection(id)
           .doc("Registros")
           .collection(dt.year.toString())
@@ -121,5 +126,33 @@ class BancoDeDados {
     }
 
     return saidas;
+  }
+
+  //para utilizar o msm ID em diferentes paginas
+  getBannerAdUnitId() {
+    return _adUnitId;
+  }
+
+  apagaBanco() async {
+    
+  }
+
+  Future<List<Map<String, dynamic>>> getFuturo() async {
+    List<Map<String, dynamic>> lista = [];
+    firestore.collection("Futuro").get().then((snapshot) {
+      List l = snapshot.docs;
+      for (int i = 0; i < l.length; i++) {
+        lista.add(l[i].data());
+      }
+    });
+    return lista;
+  }
+
+  addFeedback(String feedback) {
+    try {
+      firestore.collection("Feedback").add({"Feedback": feedback});
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 }

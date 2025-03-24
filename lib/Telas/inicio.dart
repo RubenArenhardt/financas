@@ -1,16 +1,16 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable, unused_element, prefer_const_literals_to_create_immutables
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:io';
-
 import 'package:financas/fireBase/bancoDeDados.dart';
 import 'package:financas/funcoes/funcoes.dart';
 import 'package:financas/telas/adicionar.dart';
+import 'package:financas/telas/feedback.dart';
+import 'package:financas/telas/futuro.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:financas/objetos/atualizacao.dart';
 import 'package:financas/telas/consultar.dart';
@@ -42,24 +42,20 @@ class InicioState extends State<Inicio> {
 
   InicioState(this.listaEntrada, this.listaSaida);
 
+  BannerAd? _bannerAd;
+  bool _isLoaded = false;
+
   @override
   Widget build(BuildContext context) {
+    _initializeMobileAdsSDK();
     return Scaffold(
-      //
+      drawer: Menu(notify:widget.notify, bd: widget.bd,),
       appBar: AppBar(
         title: Text(
-          "Na Ponta do Lápis",
+          "Ponta do Lápis",
           style: TextStyle(fontSize: 24),
         ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                widget.notify(null, true);
-              },
-              icon: Icon(Icons.logout))
-        ],
       ),
-      //
       body: SizedBox.expand(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -83,7 +79,6 @@ class InicioState extends State<Inicio> {
                           "Saldo",
                           style: TextStyle(
                             fontSize: 20,
-                            
                           ),
                         ),
                         textoValor(
@@ -121,14 +116,25 @@ class InicioState extends State<Inicio> {
             ),
             Container(
               margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                width: 300,
-                alignment: Alignment.center,
-                child: criaPieChart(
-                  listaSaida: listaSaida,
-                  legendPosition: LegendPosition.bottom,
-                  legendsInRow: true,
-                )),
-            carregarAnuncio(),
+              width: 300,
+              alignment: Alignment.center,
+              child: criaPieChart(
+                listaSaida: listaSaida,
+                legendPosition: LegendPosition.bottom,
+                legendsInRow: true,
+              ),
+            ),
+            if (_bannerAd != null && _isLoaded)
+              Align(
+                alignment: Alignment.topCenter,
+                child: SafeArea(
+                  child: SizedBox(
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd!),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -184,8 +190,14 @@ class InicioState extends State<Inicio> {
     );
   }
 
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
   refresh(bd) async {
-    print("inicializando refresh");
+    debugPrint("inicializando refresh");
     DateTime dt = DateTime.now();
     List<Atualizacao> entradas = await bd.getListaEntradas(dt);
     List<Atualizacao> saidas = await bd.getListaSaidas(dt);
@@ -193,5 +205,92 @@ class InicioState extends State<Inicio> {
       listaEntrada = entradas;
       listaSaida = saidas;
     });
+  }
+
+  void _initializeMobileAdsSDK() async {
+    // Inicializa o SDK do Google Mobile Ads.
+    MobileAds.instance.initialize();
+    // Carrega o banner ad.
+    _loadAd();
+  }
+
+  void _loadAd() async {
+    //Captura o tamanho da tela
+    final size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+        MediaQuery.sizeOf(context).width.truncate());
+
+    if (size == null) {
+      //Nao foi possivel carregar o tamanho do banner
+      return;
+    }
+
+    BannerAd(
+      adUnitId: widget.bd.getBannerAdUnitId(),
+      request: const AdRequest(),
+      size: size,
+      listener: BannerAdListener(
+        // Chama quando o banner é carregado
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+            _isLoaded = true;
+          });
+        },
+        // Chama quando o banner falha ao carregar  
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
+        },
+        // Chama quando o banner é clicado
+        onAdOpened: (ad) {},
+      ),
+    ).load();
+  }
+
+}
+
+class Menu extends StatelessWidget {
+
+  final Function notify;
+  final BancoDeDados bd;
+  
+
+  Menu({required this.notify, required this.bd});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: [
+          ListTile(title: Center(child: Text("Menu",style: TextStyle(fontWeight: FontWeight.bold, ),),),),
+          ListTile(
+            title: Text("O que vem por ai?"),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return Futuro(bd: bd,);
+                }));
+            },
+          ),
+          ListTile(
+            title: Text("Deixe seu feedback"),
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return FeedbackPage(bd: bd);
+              }));
+            },
+          ),
+          ListTile(
+            title: Text("Excluir Dados"),
+            onTap: bd.apagaBanco,
+          ),
+          ListTile(
+            leading: Icon(Icons.logout),
+            title: Text("Logout"),
+            onTap: () {
+                notify(null, true);
+              },
+          ),
+        ],
+      )
+    );
   }
 }

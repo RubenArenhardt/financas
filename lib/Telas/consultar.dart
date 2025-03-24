@@ -5,6 +5,7 @@ import 'package:financas/funcoes/funcoes.dart';
 import 'package:flutter/material.dart';
 
 import 'package:financas/objetos/atualizacao.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
 
@@ -31,12 +32,16 @@ class ConsultarState extends State<Consultar> {
 
   ConsultarState(this.listaEntrada, this.listaSaida, this.dt);
 
+  BannerAd? _bannerAd;
+  bool _isLoaded = false;
+
   @override
   Widget build(BuildContext context) {
     double valorTotal =
         calculaValor(listaEntrada: listaEntrada, listaSaida: listaSaida);
     String data = dt.month.toString() + "/" + dt.year.toString();
 
+    _initializeMobileAdsSDK();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Registros"),
@@ -49,7 +54,7 @@ class ConsultarState extends State<Consultar> {
               IconButton(
                 onPressed: () {
                   setState(() {
-                    dt = dt.subtract(Duration(days: 30));
+                    dt = voltaMes(dt);
                     refresh(bd: widget.bd, dt: dt);
                   });
                 },
@@ -62,7 +67,7 @@ class ConsultarState extends State<Consultar> {
               IconButton(
                 onPressed: () {
                   setState(() {
-                    dt = dt.add(Duration(days: 30));
+                    dt = passaMes(dt);
                     refresh(bd: widget.bd, dt: dt);
                   });
                 },
@@ -137,9 +142,26 @@ class ConsultarState extends State<Consultar> {
               refresh(bd: widget.bd, dt: dt);
             },
           ),
+          if (_bannerAd != null && _isLoaded)
+              Align(
+                alignment: Alignment.topCenter,
+                child: SafeArea(
+                  child: SizedBox(
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd!),
+                  ),
+                ),
+              ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
   }
 
   refresh({required BancoDeDados bd, required DateTime dt}) async {
@@ -150,6 +172,46 @@ class ConsultarState extends State<Consultar> {
       listaSaida = saidas;
     });
   }
+
+  void _initializeMobileAdsSDK() async {
+    // Inicializa o SDK do Google Mobile Ads.
+    MobileAds.instance.initialize();
+    // Carrega o banner ad.
+    _loadAd();
+  }
+
+  void _loadAd() async {
+    //Captura o tamanho da tela
+    final size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+        MediaQuery.sizeOf(context).width.truncate());
+
+    if (size == null) {
+      //Nao foi possivel carregar o tamanho do banner
+      return;
+    }
+
+    BannerAd(
+      adUnitId: widget.bd.getBannerAdUnitId(),
+      request: const AdRequest(),
+      size: size,
+      listener: BannerAdListener(
+        // Chama quando o banner é carregado
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+            _isLoaded = true;
+          });
+        },
+        // Chama quando o banner falha ao carregar  
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
+        },
+        // Chama quando o banner é clicado
+        onAdOpened: (ad) {},
+      ),
+    ).load();
+  }
+
 }
 
 Color corValor(double valor) {
