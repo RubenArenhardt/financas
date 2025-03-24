@@ -155,15 +155,4 @@ class BancoDeDados {
       debugPrint(e.toString());
     }
   }
-
-  //in progress
-  getAllAtualizacao() async {
-    final List<Atualizacao> listaEntrada = [], listaSaida = [];
-
-    firestore.collection(id).get().then((snapshot) {
-      snapshot.docs.forEach((lista) {
-        lista.data().forEach((key, value) {});
-      });
-    });
-  }
 }
