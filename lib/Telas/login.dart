@@ -24,14 +24,13 @@ class ChecardorLoginState extends State<ChecadorLogin> {
 
   @override
   Widget build(BuildContext context) {
-    
     if (usuario != null) {
       DateTime dt = DateTime.now();
       List<Atualizacao> listaEntrada = [], listaSaida = [];
       final bd = BancoDeDados(id: usuario!.uid);
 
       return FutureBuilder(
-          future: Future.wait([bd.getListaEntradas(dt), bd.getListaSaida(dt)]),
+          future: Future.wait([bd.getListaEntradas(dt), bd.getListaSaidas(dt)]),
           builder: (context, AsyncSnapshot<List<List<Atualizacao>>> snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
@@ -77,19 +76,34 @@ class FazerLogin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: TextButton(
-          onPressed: () async {
-            try {
-              Future<User?> future = signInWithGoogle();
-              future.then((user) {
-                notify(user, false);
-              });
-            } on Exception catch (e) {
-              debugPrint(e.toString());
-            }
-          },
-          child: Text("Fazer Login com Google")),
+    return Scaffold(
+      body: Container(
+        color: const Color.fromARGB(255, 18, 32, 47),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image(image: AssetImage("assets/logo.png"),height: 200,),
+              SizedBox(height: 10),
+              Text("Ponta do Lápis", style: TextStyle(fontSize: 24)),
+              SizedBox(height: 10),
+              TextButton(
+                onPressed: () async {
+                  try {
+                    Future<User?> future = signInWithGoogle();
+                    future.then((user) {
+                      notify(user, false);
+                    });
+                  } on Exception catch (e) {
+                    debugPrint(e.toString());
+                  }
+                },
+                child: Text("Fazer Login com Google"),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
