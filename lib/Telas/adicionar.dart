@@ -21,18 +21,19 @@ final MoneyMaskedTextController _controllerValor =
     MoneyMaskedTextController(leftSymbol: 'R\$ ');
 
 List<String> tagsEntrada = [
-  "Salario",
-  "Investimento",
-  "Outras Entradas",
-], tagsSaida = [
-  "Investimento",
-  "Mercado",
-  "Transporte",
-  "Comida",
-  "Casa",
-  "Lazer",
-  "Outras Saídas",
-];
+      "Salario",
+      "Investimento",
+      "Outras Entradas",
+    ],
+    tagsSaida = [
+      "Investimento",
+      "Mercado",
+      "Transporte",
+      "Comida",
+      "Casa",
+      "Lazer",
+      "Outras Saídas",
+    ];
 
 final TextEditingController _controllerTag = TextEditingController();
 String tagAnterior = "";
@@ -58,8 +59,6 @@ class AdicionarState extends State<Adicionar> {
 
   BannerAd? _bannerAd;
   bool _isLoaded = false;
-
-  
 
   @override
   void initState() {
@@ -132,7 +131,17 @@ class AdicionarState extends State<Adicionar> {
 
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 30, 0, 10),
-                  child: DropdownMenuTag(),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        DropdownMenuTag(),
+                        IconButton(
+                          onPressed: () => _modListaTag(context),
+                          icon: Icon(Icons.add_circle),
+                        ),
+                        IconButton(
+                            onPressed: () {}, icon: Icon(Icons.remove_circle)),
+                      ]),
                 ),
                 //ToDo:
                 //Adicionar opção de adicionar itens personalizados para as listas
@@ -340,7 +349,7 @@ class _TagState extends State<DropdownMenuTag> {
     String tagSelecionada;
     if (tagAnterior != "") {
       tagSelecionada = tagAnterior;
-    }else{
+    } else {
       tagSelecionada = tagsFiltradas.first;
     }
     return DropdownMenu<String>(
@@ -395,6 +404,41 @@ class _DatePicker extends State {
       });
     }
   }
+}
+
+_modListaTag(BuildContext context) {
+  final TextEditingController _textController = TextEditingController();
+  return showDialog(
+      context: context,
+      builder: (BuildContext context) => Dialog(
+              child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              RadioButton(onChanged: (radioButtonList? value) {}),
+              TextField(
+                controller: _textController,
+                decoration: InputDecoration(hintText: "Nome da Tag"),
+              ),
+              TextButton(
+                onPressed: () {
+                  if (_textController.text.isNotEmpty) {
+                    if (_radioButtonSelecionado == radioButtonList.Entrada) {
+                      tagsEntrada.add(_textController.text);
+                    } else {
+                      tagsSaida.add(_textController.text);
+                    }
+                  }
+                  Navigator.pop(context);
+                },
+                child: Text("Adicionar"),
+              ),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Cancelar"))
+            ]),
+          )));
 }
 
 Atualizacao _criaAtualizacao() {
