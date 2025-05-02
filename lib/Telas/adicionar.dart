@@ -299,39 +299,32 @@ class _EntradaSaidaRadio extends State<RadioButton> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Expanded(
-          child: Container(
-            child: ListTile(
-              title: Text("Entrada"),
-              leading: Radio(
-                  value: radioButtonList.Entrada,
-                  groupValue: _radioButtonSelecionado,
-                  onChanged: (radioButtonList? value) {
-                    setState(() {
-                      _radioButtonSelecionado = value;
-                    });
-                    widget.onChanged(value);
-                  }),
-            ),
-          ),
-        ),
-        Expanded(
-          child: Container(
-            child: ListTile(
-              title: Text("Saída"),
-              leading: Radio(
-                  value: radioButtonList.Saida,
-                  groupValue: _radioButtonSelecionado,
-                  onChanged: (radioButtonList? value) {
-                    setState(() {
-                      _radioButtonSelecionado = value;
-                    });
-                    widget.onChanged(value);
-                  }),
-            ),
-          ),
-        ),
+        Row(mainAxisSize: MainAxisSize.min,spacing: 0,children: [
+          Radio(
+              value: radioButtonList.Entrada,
+              groupValue: _radioButtonSelecionado,
+              onChanged: (radioButtonList? value) {
+                setState(() {
+                  _radioButtonSelecionado = value;
+                });
+                widget.onChanged(value);
+              }),
+          Text("Entrada"),
+        ]),
+        Row(mainAxisSize: MainAxisSize.min,spacing: 0, children: [
+          Radio(
+              value: radioButtonList.Saida,
+              groupValue: _radioButtonSelecionado,
+              onChanged: (radioButtonList? value) {
+                setState(() {
+                  _radioButtonSelecionado = value;
+                });
+                widget.onChanged(value);
+              }),
+          Text("Saída"),
+        ]),
       ],
     );
   }
@@ -412,31 +405,33 @@ _modListaTag(BuildContext context) {
       context: context,
       builder: (BuildContext context) => Dialog(
               child: Padding(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(20),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               RadioButton(onChanged: (radioButtonList? value) {}),
               TextField(
                 controller: _textController,
                 decoration: InputDecoration(hintText: "Nome da Tag"),
               ),
-              TextButton(
-                onPressed: () {
-                  if (_textController.text.isNotEmpty) {
-                    if (_radioButtonSelecionado == radioButtonList.Entrada) {
-                      tagsEntrada.add(_textController.text);
-                    } else {
-                      tagsSaida.add(_textController.text);
-                    }
-                  }
-                  Navigator.pop(context);
-                },
-                child: Text("Adicionar"),
-              ),
-              TextButton(
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                TextButton(
                   onPressed: () {
+                    if (_textController.text.isNotEmpty) {
+                      if (_radioButtonSelecionado == radioButtonList.Entrada) {
+                        tagsEntrada.add(_textController.text);
+                      } else {
+                        tagsSaida.add(_textController.text);
+                      }
+                    }
                     Navigator.pop(context);
                   },
-                  child: Text("Cancelar"))
+                  child: Text("Adicionar"),
+                ),
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Cancelar"))
+              ])
             ]),
           )));
 }
