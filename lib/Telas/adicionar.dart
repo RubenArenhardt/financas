@@ -76,7 +76,7 @@ class AdicionarState extends State<Adicionar> {
     } else {
       _controllerNome.text = "";
       _controllerValor.updateValue(0);
-      _controllerTag.text = "Salario";
+      _controllerTag.text = tagsEntrada.first;
       _controllerData.text = DateFormat(DateFormat.YEAR_NUM_MONTH_DAY, "pt_Br")
           .format(DateTime.now());
       _controllerObservacao.text = "";
@@ -136,11 +136,12 @@ class AdicionarState extends State<Adicionar> {
                       children: [
                         DropdownMenuTag(),
                         IconButton(
-                          onPressed: () => _modListaTag(context),
+                          onPressed: () => _modListaTag(context, true),
                           icon: Icon(Icons.add_circle),
                         ),
                         IconButton(
-                            onPressed: () {}, icon: Icon(Icons.remove_circle)),
+                            onPressed: () => _modListaTag(context, false),
+                            icon: Icon(Icons.remove_circle)),
                       ]),
                 ),
                 //ToDo:
@@ -161,7 +162,7 @@ class AdicionarState extends State<Adicionar> {
                   padding: EdgeInsets.fromLTRB(0, 0, 0, 30),
                   child: SelecionarData(),
                 ),
-                //
+
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 0, 0, 30),
                   child: TextField(
@@ -301,7 +302,7 @@ class _EntradaSaidaRadio extends State<RadioButton> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Row(mainAxisSize: MainAxisSize.min,spacing: 0,children: [
+        Row(mainAxisSize: MainAxisSize.min, spacing: 0, children: [
           Radio(
               value: radioButtonList.Entrada,
               groupValue: _radioButtonSelecionado,
@@ -313,7 +314,7 @@ class _EntradaSaidaRadio extends State<RadioButton> {
               }),
           Text("Entrada"),
         ]),
-        Row(mainAxisSize: MainAxisSize.min,spacing: 0, children: [
+        Row(mainAxisSize: MainAxisSize.min, spacing: 0, children: [
           Radio(
               value: radioButtonList.Saida,
               groupValue: _radioButtonSelecionado,
@@ -399,41 +400,112 @@ class _DatePicker extends State {
   }
 }
 
-_modListaTag(BuildContext context) {
+_modListaTag(BuildContext context, bool isAdd) {
   final TextEditingController _textController = TextEditingController();
+  final Widget _botao;
+  final Widget _selecao;
+  
+  if (isAdd) {
+    _selecao = TextField(
+      controller: _textController,
+      decoration: InputDecoration(hintText: "Nome da Tag"),
+    );
+
+    _botao = TextButton(
+      onPressed: () {
+        if (_textController.text.isNotEmpty) {
+          if (_radioButtonSelecionado == radioButtonList.Entrada) {
+            tagsEntrada.add(_textController.text);
+          } else {
+            tagsSaida.add(_textController.text);
+          }
+          if (_radioButtonSelecionado == radioButtonList.Entrada) {
+            if (tagsEntrada.isNotEmpty) {
+              _controllerTag.text = tagsEntrada.first;
+            } else {
+              _controllerTag.text = "";
+            }
+          } else {
+            if (tagsSaida.isNotEmpty) {
+              _controllerTag.text = tagsSaida.first;
+            } else {
+              _controllerTag.text = "";
+            }
+          }
+        }
+        Navigator.pop(context);
+      },
+      child: Text("Adicionar"),
+    );
+  } else {
+    _selecao = DropdownMenuTag();
+
+    _botao = TextButton(
+      onPressed: () {
+        if (_controllerTag.text.isNotEmpty) {
+          if (_radioButtonSelecionado == radioButtonList.Entrada) {
+            tagsEntrada.remove(_controllerTag.text);
+          } else {
+            tagsSaida.remove(_controllerTag.text);
+          }
+          if (_radioButtonSelecionado == radioButtonList.Entrada) {
+            if (tagsEntrada.isNotEmpty) {
+              _controllerTag.text = tagsEntrada.first;
+            } else {
+              _controllerTag.text = "";
+            }
+          } else {
+            if (tagsSaida.isNotEmpty) {
+              _controllerTag.text = tagsSaida.first;
+            } else {
+              _controllerTag.text = "";
+            }
+          }
+        }
+        Navigator.pop(context);
+      },
+      child: Text("Remover"),
+    );
+  }
+
   return showDialog(
       context: context,
       builder: (BuildContext context) => Dialog(
               child: Padding(
             padding: EdgeInsets.all(20),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              RadioButton(onChanged: (radioButtonList? value) {}),
-              TextField(
-                controller: _textController,
-                decoration: InputDecoration(hintText: "Nome da Tag"),
-              ),
+            child: DialogCustom(botao: _botao, selecao: _selecao)
+          )));
+}
+
+class DialogCustom extends StatefulWidget{
+
+  DialogCustom({required this.botao, required this.selecao});
+  final Widget botao;
+  final Widget selecao;
+  @override
+  State<StatefulWidget> createState() => DialogCustomState();
+}
+
+class DialogCustomState extends State<DialogCustom>{
+  @override
+  Widget build(BuildContext context) {
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+              RadioButton(onChanged: (radioButtonList? value) {
+                setState(() {
+                  _radioButtonSelecionado = value;
+                });
+              }),
+              widget.selecao,
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                TextButton(
-                  onPressed: () {
-                    if (_textController.text.isNotEmpty) {
-                      if (_radioButtonSelecionado == radioButtonList.Entrada) {
-                        tagsEntrada.add(_textController.text);
-                      } else {
-                        tagsSaida.add(_textController.text);
-                      }
-                    }
-                    Navigator.pop(context);
-                  },
-                  child: Text("Adicionar"),
-                ),
+                widget.botao,
                 TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
                     child: Text("Cancelar"))
               ])
-            ]),
-          )));
+            ]);
+  }
 }
 
 Atualizacao _criaAtualizacao() {

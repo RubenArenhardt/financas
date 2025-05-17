@@ -12,6 +12,13 @@
             "program": "lib/main.dart"
         },
         {
+            "name": "financas(debug)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "program": "lib/main.dart"
+        },
+        {
             "name": "financas (profile mode)",
             "request": "launch",
             "type": "dart",
